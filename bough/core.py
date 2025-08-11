@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Set
 
+import git
+
 
 @dataclass
 class Package:
@@ -72,3 +74,8 @@ class BoughAnalyzer:
             for dependency in package.dependencies:
                 if dependency in self.dependency_graph:
                     self.dependency_graph[dependency].add(package_name)
+    
+    def get_affected_packages(self, base_commit="HEAD^"):
+        """Get packages affected by git changes since base_commit."""
+        # TODO: Implement git change detection
+        raise NotImplementedError("get_affected_packages not yet implemented")
