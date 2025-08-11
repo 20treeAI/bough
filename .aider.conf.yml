@@ -1,0 +1,7 @@
+read:
+  - docs/usage.md
+  - docs/test-style.md
+  - docs/implementation-notes.md
+  - README.md
+  - Justfile
+  - pyproject.toml
