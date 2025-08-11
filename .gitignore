@@ -1,2 +1,4 @@
 .aider*
 *.swp
+__pycache__
+.pyc
