@@ -25,13 +25,16 @@ bough --format github-matrix
 
 ## Configuration
 
-`.bough.toml`:
-```toml
+`.bough.yml`:
+```yaml
 # Packages that produce build artifacts (default: ["apps/*"])
-buildable = ["apps/*"]
+buildable:
+  - "apps/*"
 
 # Files that never trigger rebuilds
-ignore = ["*.md", "docs/**"]
+ignore:
+  - "*.md"
+  - "docs/**"
 ```
 
 ## How It Works
