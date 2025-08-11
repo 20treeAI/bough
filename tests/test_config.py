@@ -6,7 +6,7 @@ import logging
 import pytest
 
 import bough.config as sut
-from bough.core import BoughAnalyzer
+from bough.analyzer import BoughAnalyzer
 
 
 def test_default_config_values(tmp_path):

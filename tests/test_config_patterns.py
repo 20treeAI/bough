@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from bough.core import BoughAnalyzer
+from bough.analyzer import BoughAnalyzer
 from bough.config import BoughConfig
 
 

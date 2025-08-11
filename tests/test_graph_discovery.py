@@ -2,7 +2,7 @@
 
 import pytest
 
-from bough.core import BoughAnalyzer
+from bough.analyzer import BoughAnalyzer
 
 
 def test_dependency_graph_discovery(sample_workspace, empty_config):
