@@ -7,6 +7,8 @@ from typing import List
 
 import yaml
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class BoughConfig:
@@ -19,25 +21,25 @@ class BoughConfig:
 def load_config(config_path: Path) -> BoughConfig:
     """Load configuration from .bough.yml file."""
     defaults = BoughConfig(buildable=["apps/*"], ignore=["*.md"])
-    
+
     if not config_path.exists():
-        logging.info(f"Config file not found at {config_path}, using defaults")
+        logger.info(f"Config file not found at {config_path}, using defaults")
         return defaults
-    
+
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path, "r") as f:
             data = yaml.safe_load(f)
-        
+
         if data is None:
             data = {}
-        
+
         return BoughConfig(
-            buildable=data.get('buildable', defaults.buildable),
-            ignore=data.get('ignore', defaults.ignore)
+            buildable=data.get("buildable", defaults.buildable),
+            ignore=data.get("ignore", defaults.ignore),
         )
-    except yaml.YAMLError as e:
-        logging.warning(f"Invalid YAML in {config_path}: {e}. Using defaults.")
+    except yaml.YAMLError:
+        logger.exception(f"Invalid YAML in {config_path}. Using defaults.")
         return defaults
-    except Exception as e:
-        logging.warning(f"Failed to parse config {config_path}: {e}. Using defaults.")
+    except Exception:
+        logger.exception(f"Failed to parse config {config_path}. Using defaults.")
         return defaults
