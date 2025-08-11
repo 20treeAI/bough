@@ -77,5 +77,61 @@ class BoughAnalyzer:
     
     def get_affected_packages(self, base_commit="HEAD^"):
         """Get packages affected by git changes since base_commit."""
-        # TODO: Implement git change detection
-        raise NotImplementedError("get_affected_packages not yet implemented")
+        repo = git.Repo(self.workspace_root)
+        
+        # Get changed files
+        changed_files = set()
+        for item in repo.commit(base_commit).diff(repo.head.commit):
+            if item.a_path:
+                changed_files.add(item.a_path)
+            if item.b_path:
+                changed_files.add(item.b_path)
+        
+        # Map changed files to affected packages
+        directly_affected = set()
+        for file_path in changed_files:
+            file_path_obj = Path(file_path)
+            
+            # Skip ignored file types
+            if file_path.endswith('.md'):
+                continue
+            
+            # Check if file belongs to a specific package
+            package_found = False
+            for package_name, package in self.packages.items():
+                package_rel_path = package.directory.relative_to(self.workspace_root)
+                try:
+                    file_path_obj.relative_to(package_rel_path)
+                    directly_affected.add(package_name)
+                    package_found = True
+                    break
+                except ValueError:
+                    # File is not in this package directory
+                    continue
+            
+            # If file doesn't belong to any package, it's a root file
+            if not package_found:
+                directly_affected.update(self.packages.keys())
+        
+        # Calculate transitive dependencies
+        all_affected = set(directly_affected)
+        queue = list(directly_affected)
+        
+        while queue:
+            pkg = queue.pop(0)
+            # Find packages that depend on this one
+            dependents = self.dependency_graph.get(pkg, set())
+            for dependent in dependents:
+                if dependent not in all_affected:
+                    all_affected.add(dependent)
+                    queue.append(dependent)
+        
+        # Filter to buildable packages only (apps/*)
+        buildable_affected = set()
+        for package_name in all_affected:
+            package = self.packages[package_name]
+            package_rel_path = package.directory.relative_to(self.workspace_root)
+            if package_rel_path.parts[0] == "apps":
+                buildable_affected.add(package_name)
+        
+        return buildable_affected
