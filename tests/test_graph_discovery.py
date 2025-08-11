@@ -64,27 +64,19 @@ def test_dependency_graph_discovery(sample_workspace):
 
 
 @pytest.mark.parametrize(
-    ["changed_file", "expected_affected"],
+    ["changed_file", "expected_affected", "reason"],
     [
-        # Change auth package -> only api is affected (api depends on auth)
-        ("packages/auth/auth.py", {"api"}),
-        # Change database package -> both api and web affected (both depend on database transitively)
-        ("packages/database/database.py", {"api", "web"}),
-        # Change shared package -> both api and web affected (both depend on shared)
-        ("packages/shared/shared.py", {"api", "web"}),
-        # Change api package -> only api affected (it's the package itself)
-        ("apps/api/api.py", {"api"}),
-        # Change web package -> only web affected (it's the package itself)
-        ("apps/web/web.py", {"web"}),
-        # Change root pyproject.toml -> all buildable packages affected
-        ("pyproject.toml", {"api", "web"}),
-        # Change README.md -> no packages affected (ignored file type)
-        ("README.md", set()),
-        # Change file in package subdirectory -> affects that package
-        ("packages/auth/utils/helpers.py", {"api"}),
+        ("packages/auth/auth.py", {"api"}, "api depends on auth"),
+        ("packages/database/database.py", {"api", "web"}, "both depend on database transitively"),
+        ("packages/shared/shared.py", {"api", "web"}, "both depend on shared"),
+        ("apps/api/api.py", {"api"}, "package affects itself"),
+        ("apps/web/web.py", {"web"}, "package affects itself"),
+        ("pyproject.toml", {"api", "web"}, "root config affects all buildable packages"),
+        ("README.md", set(), "ignored file type"),
+        ("packages/auth/utils/helpers.py", {"api"}, "subdirectory file affects parent package"),
     ],
 )
-def test_git_change_detection(git_workspace, changed_file, expected_affected):
+def test_git_change_detection(git_workspace, changed_file, expected_affected, reason):
     """Test that we correctly detect affected packages from git changes."""
     repo = git.Repo(git_workspace)
 
@@ -107,4 +99,4 @@ def test_git_change_detection(git_workspace, changed_file, expected_affected):
     # This should detect what changed and find affected packages
     affected = analyzer.get_affected_packages()
 
-    assert affected == expected_affected
+    assert affected == expected_affected, reason
