@@ -1,0 +1,2 @@
+buildable = ["apps/*"]
+ignore = ["*.md", "docs/**"]
