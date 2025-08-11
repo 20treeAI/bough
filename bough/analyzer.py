@@ -68,6 +68,11 @@ class BoughAnalyzer:
                     for dep_name, source_config in uv_sources.items():
                         if source_config.get("workspace") is True:
                             dependencies.add(dep_name)
+                    
+                    # Debug: print what we found
+                    print(f"DEBUG: Package {package_name} at {package_path}")
+                    print(f"DEBUG: uv_sources = {uv_sources}")
+                    print(f"DEBUG: dependencies = {dependencies}")
 
                     self.packages[package_name] = Package(
                         name=package_name,

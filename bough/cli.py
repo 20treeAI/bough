@@ -32,8 +32,6 @@ def format_human_readable(analyzer: BoughAnalyzer, affected_packages: set[str], 
 def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
     """Format dependency graph for display."""
     lines = []
-    lines.append("Dependency Graph:")
-    lines.append("")
     
     # Get buildable packages for highlighting
     buildable_packages = set()
@@ -41,29 +39,61 @@ def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
         if analyzer._is_buildable_package(package):
             buildable_packages.add(package_name)
     
-    # Sort packages for consistent output
+    # Separate buildable and library packages
+    buildable = []
+    libraries = []
+    
     for package_name in sorted(analyzer.packages.keys()):
         package = analyzer.packages[package_name]
         rel_path = package.directory.relative_to(analyzer.workspace_root)
         
-        # Mark buildable packages
-        marker = " [BUILDABLE]" if package_name in buildable_packages else ""
-        lines.append(f"{package_name} ({rel_path}){marker}")
+        package_info = {
+            'name': package_name,
+            'path': rel_path,
+            'dependencies': package.dependencies,
+            'dependents': analyzer.dependency_graph.get(package_name, set())
+        }
         
-        # Show dependencies
-        if package.dependencies:
-            lines.append("  depends on:")
-            for dep in sorted(package.dependencies):
-                lines.append(f"    {dep}")
-        
-        # Show dependents (reverse dependencies)
-        dependents = analyzer.dependency_graph.get(package_name, set())
-        if dependents:
-            lines.append("  depended on by:")
-            for dependent in sorted(dependents):
-                lines.append(f"    {dependent}")
-        
-        lines.append("")
+        if package_name in buildable_packages:
+            buildable.append(package_info)
+        else:
+            libraries.append(package_info)
+    
+    # Display buildable packages first
+    if buildable:
+        lines.append("🚀 Buildable Packages:")
+        lines.append("=" * 50)
+        for pkg in buildable:
+            lines.append(f"📦 {pkg['name']} ({pkg['path']})")
+            if pkg['dependencies']:
+                lines.append(f"   └─ depends on: {', '.join(sorted(pkg['dependencies']))}")
+            else:
+                lines.append("   └─ depends on: (none)")
+            
+            # Warn if buildable packages have dependents (architectural issue)
+            if pkg['dependents']:
+                lines.append(f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)")
+            lines.append("")
+    
+    # Display library packages
+    if libraries:
+        lines.append("📚 Library Packages:")
+        lines.append("=" * 50)
+        for pkg in libraries:
+            lines.append(f"📖 {pkg['name']} ({pkg['path']})")
+            if pkg['dependencies']:
+                lines.append(f"   ├─ depends on: {', '.join(sorted(pkg['dependencies']))}")
+            else:
+                lines.append("   ├─ depends on: (none)")
+            
+            if pkg['dependents']:
+                lines.append(f"   └─ depended on by: {', '.join(sorted(pkg['dependents']))}")
+            else:
+                lines.append("   └─ depended on by: (none)")
+            lines.append("")
+    
+    if not buildable and not libraries:
+        lines.append("No packages found in workspace.")
     
     return "\n".join(lines)
 
