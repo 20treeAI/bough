@@ -1,5 +1,6 @@
 """Core analysis logic for bough."""
 
+import fnmatch
 import glob
 import tomllib
 from dataclasses import dataclass
@@ -86,6 +87,18 @@ class BoughAnalyzer:
                 if dependency in self.dependency_graph:
                     self.dependency_graph[dependency].add(package_name)
 
+    def _matches_patterns(self, path: str, patterns: list[str]) -> bool:
+        """Check if a path matches any of the given glob patterns."""
+        for pattern in patterns:
+            if fnmatch.fnmatch(path, pattern):
+                return True
+        return False
+
+    def _is_buildable_package(self, package: Package) -> bool:
+        """Check if a package matches buildable patterns."""
+        package_rel_path = str(package.directory.relative_to(self.workspace_root))
+        return self._matches_patterns(package_rel_path, self.config.buildable)
+
     def get_affected_packages(self, base_commit="HEAD^"):
         """Get packages affected by git changes since base_commit."""
         repo = git.Repo(self.workspace_root)
@@ -103,8 +116,8 @@ class BoughAnalyzer:
         for file_path in changed_files:
             file_path_obj = Path(file_path)
 
-            # Skip ignored file types
-            if file_path.endswith(".md"):
+            # Skip ignored files
+            if self._matches_patterns(file_path, self.config.ignore):
                 continue
 
             # Check if file belongs to a specific package
@@ -137,12 +150,11 @@ class BoughAnalyzer:
                     all_affected.add(dependent)
                     queue.append(dependent)
 
-        # Filter to buildable packages only (apps/*)
+        # Filter to buildable packages only
         buildable_affected = set()
         for package_name in all_affected:
             package = self.packages[package_name]
-            package_rel_path = package.directory.relative_to(self.workspace_root)
-            if package_rel_path.parts[0] == "apps":
+            if self._is_buildable_package(package):
                 buildable_affected.add(package_name)
 
         return buildable_affected
