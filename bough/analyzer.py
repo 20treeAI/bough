@@ -60,25 +60,48 @@ class BoughAnalyzer:
 
                     package_name = package_config["project"]["name"]
 
-                    # Parse dependencies from tool.uv.sources
+                    # Parse workspace dependencies from multiple sources
+                    dependencies = set()
+
+                    # Method 1: tool.uv.sources (explicit workspace deps)
                     uv_sources = (
                         package_config.get("tool", {}).get("uv", {}).get("sources", {})
                     )
-                    dependencies = set()
                     for dep_name, source_config in uv_sources.items():
                         if source_config.get("workspace") is True:
                             dependencies.add(dep_name)
-                    
-                    # Debug: print what we found
-                    print(f"DEBUG: Package {package_name} at {package_path}")
-                    print(f"DEBUG: uv_sources = {uv_sources}")
-                    print(f"DEBUG: dependencies = {dependencies}")
+
+                    # Method 2: Check if regular dependencies are workspace packages
+                    project_deps = package_config.get("project", {}).get(
+                        "dependencies", []
+                    )
+                    for dep_spec in project_deps:
+                        # Extract package name from dependency spec (e.g., "package>=1.0" -> "package")
+                        dep_name = (
+                            dep_spec.split(">=")[0]
+                            .split("==")[0]
+                            .split("~=")[0]
+                            .split(">")[0]
+                            .split("<")[0]
+                            .split("!")[0]
+                            .split("[")[0]
+                            .strip()
+                        )
+                        # Add to potential dependencies - we'll filter to workspace packages later
+                        dependencies.add(dep_name)
 
                     self.packages[package_name] = Package(
                         name=package_name,
                         directory=package_path,
                         dependencies=dependencies,
                     )
+
+        # Second pass: filter dependencies to only include workspace packages
+        all_package_names = set(self.packages.keys())
+        for package in self.packages.values():
+            # Only keep dependencies that are actually workspace packages
+            workspace_deps = package.dependencies.intersection(all_package_names)
+            package.dependencies = workspace_deps
 
     def _build_dependency_graph(self):
         """Build reverse dependency graph (who depends on whom)."""
