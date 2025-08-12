@@ -1,6 +1,7 @@
 """Command line interface for bough."""
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -27,6 +28,22 @@ def format_human_readable(analyzer: BoughAnalyzer, affected_packages: set[str], 
             lines.append(f"  {file_path}")
     
     return "\n".join(lines)
+
+
+def format_github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
+    """Format output as GitHub Actions matrix JSON."""
+    matrix_items = []
+    
+    for package_name in sorted(affected_packages):
+        package = analyzer.packages[package_name]
+        rel_path = str(package.directory.relative_to(analyzer.workspace_root))
+        matrix_items.append({
+            "package": package_name,
+            "directory": rel_path
+        })
+    
+    matrix = {"include": matrix_items}
+    return json.dumps(matrix, indent=2)
 
 
 def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
@@ -142,6 +159,12 @@ def main():
         default="HEAD^",
         help="Base commit to compare against (default: HEAD^)"
     )
+    analyze_parser.add_argument(
+        "--format",
+        choices=["text", "github-matrix"],
+        default="text",
+        help="Output format (default: text)"
+    )
     
     # Graph command
     graph_parser = subparsers.add_parser(
@@ -155,6 +178,7 @@ def main():
     if args.command is None:
         args.command = "analyze"
         args.base = "HEAD^"
+        args.format = "text"
     
     # Determine config path
     if args.config:
@@ -171,13 +195,18 @@ def main():
             sys.exit(0)
         else:  # analyze
             affected_packages = analyzer.get_affected_packages(args.base)
-            changed_files = get_changed_files(analyzer, args.base)
             
-            output = format_human_readable(analyzer, affected_packages, changed_files)
-            print(output)
-            
-            # Exit with non-zero if packages need rebuilding (useful for CI)
-            sys.exit(0 if not affected_packages else 1)
+            if args.format == "github-matrix":
+                output = format_github_matrix(analyzer, affected_packages)
+                print(output)
+                # Always exit 0 for matrix output (GitHub Actions expects this)
+                sys.exit(0)
+            else:  # text format
+                changed_files = get_changed_files(analyzer, args.base)
+                output = format_human_readable(analyzer, affected_packages, changed_files)
+                print(output)
+                # Exit with non-zero if packages need rebuilding (useful for CI)
+                sys.exit(0 if not affected_packages else 1)
         
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

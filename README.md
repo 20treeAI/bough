@@ -22,8 +22,8 @@ bough --base main
 # Display dependency graph
 bough graph
 
-# Output GitHub Actions matrix format (coming soon)
-bough --format github-matrix
+# Output GitHub Actions matrix format
+bough analyze --format github-matrix
 ```
 
 ### GitHub Actions Integration
