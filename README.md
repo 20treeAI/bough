@@ -19,9 +19,16 @@ bough
 # Custom base commit
 bough --base main
 
-# Output GitHub Actions matrix format
+# Display dependency graph
+bough graph
+
+# Output GitHub Actions matrix format (coming soon)
 bough --format github-matrix
 ```
+
+### GitHub Actions Integration
+
+See [GitHub Actions Integration Guide](docs/github-actions.md) for complete examples of using Bough in CI/CD pipelines.
 
 ## Configuration
 
