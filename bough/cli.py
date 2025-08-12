@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 
@@ -135,6 +136,11 @@ def main():
         default=Path.cwd(),
         help="Path to workspace root (default: current directory)"
     )
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Enable verbose logging"
+    )
     
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     
@@ -160,6 +166,13 @@ def main():
     )
     
     args = parser.parse_args()
+    
+    # Configure logging
+    log_level = logging.DEBUG if args.verbose else logging.WARNING
+    logging.basicConfig(
+        level=log_level,
+        format="%(levelname)s: %(message)s"
+    )
     
     if args.command is None:
         args.command = "analyze"
