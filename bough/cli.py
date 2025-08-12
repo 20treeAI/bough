@@ -185,7 +185,7 @@ def main():
         config_path = args.workspace / ".bough.yml"
     
     try:
-        analyzer = BoughAnalyzer(args.workspace, config_path)
+        analyzer = BoughAnalyzer.from_workspace(args.workspace, config_path)
         
         if args.command == "graph":
             output = format_dependency_graph(analyzer)

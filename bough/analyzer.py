@@ -9,7 +9,7 @@ from typing import Dict, Set
 import git
 from packaging.requirements import Requirement
 
-from .config import load_config
+from .config import BoughConfig, load_config
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +22,22 @@ class Package:
 
 
 class BoughAnalyzer:
-    def __init__(self, workspace_root: Path, config_path: Path):
+    def __init__(self, workspace_root: Path, config: 'BoughConfig', packages: Dict[str, Package] = None):
         self.workspace_root = workspace_root
         logger.debug(f"Initializing analyzer for workspace: {workspace_root}")
-        self.config = load_config(config_path)
-        self.packages = {}
+        self.config = config
+        self.packages = packages or {}
         self.dependency_graph = {}
-        self._discover_packages()
+        if packages is None:
+            self._discover_packages()
         self._build_dependency_graph()
         logger.debug(f"Discovered {len(self.packages)} packages")
+
+    @classmethod
+    def from_workspace(cls, workspace_root: Path, config_path: Path):
+        """Create analyzer by discovering packages from workspace."""
+        config = load_config(config_path)
+        return cls(workspace_root, config)
 
     def _discover_packages(self):
         root_pyproject = self.workspace_root / "pyproject.toml"

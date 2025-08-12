@@ -6,7 +6,7 @@ from bough.analyzer import BoughAnalyzer
 
 
 def test_dependency_graph_discovery(sample_workspace, empty_config):
-    analyzer = BoughAnalyzer(sample_workspace, empty_config)
+    analyzer = BoughAnalyzer.from_workspace(sample_workspace, empty_config)
 
     # Verify packages were discovered
     expected_packages = {"auth", "database", "shared", "api", "web"}
@@ -74,7 +74,7 @@ def test_git_change_detection(git_workspace, empty_config, changed_file, expecte
     repo.git.add(".")
     repo.index.commit(f"Update {changed_file}")
 
-    analyzer = BoughAnalyzer(git_workspace, empty_config)
+    analyzer = BoughAnalyzer.from_workspace(git_workspace, empty_config)
 
     # This should detect what changed and find affected packages
     affected = analyzer.get_affected_packages()

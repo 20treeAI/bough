@@ -18,7 +18,7 @@ ignore:
   - "*.md"
 """)
     
-    analyzer = BoughAnalyzer(sample_workspace, config_path)
+    analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
     
     # Modify a file that affects everything
     import git
@@ -56,7 +56,7 @@ ignore:
   - "*.md"
 """)
     
-    analyzer = BoughAnalyzer(sample_workspace, config_path)
+    analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
     
     import git
     repo = git.Repo.init(sample_workspace)
@@ -94,7 +94,7 @@ ignore:
   - "docs/**"
 """)
     
-    analyzer = BoughAnalyzer(sample_workspace, config_path)
+    analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
     
     import git
     repo = git.Repo.init(sample_workspace)
@@ -129,7 +129,7 @@ ignore:
   - "docs/**"
 """)
     
-    analyzer = BoughAnalyzer(sample_workspace, config_path)
+    analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
     
     import git
     repo = git.Repo.init(sample_workspace)
