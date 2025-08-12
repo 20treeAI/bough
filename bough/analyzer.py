@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, Set
 
 import git
+from packaging.requirements import Requirement
 
 from .config import load_config
 
@@ -73,18 +74,11 @@ class BoughAnalyzer:
                         "dependencies", []
                     )
                     for dep_spec in project_deps:
-                        # Extract package name from dependency spec (e.g., "package>=1.0" -> "package")
-                        dep_name = (
-                            dep_spec.split(">=")[0]
-                            .split("==")[0]
-                            .split("~=")[0]
-                            .split(">")[0]
-                            .split("<")[0]
-                            .split("!")[0]
-                            .split("[")[0]
-                            .strip()
-                        )
-                        dependencies.add(dep_name)
+                        try:
+                            dep_name = Requirement(dep_spec).name
+                            dependencies.add(dep_name)
+                        except Exception:
+                            logger.debug(f"Skipping invalid dependency spec: {dep_spec}")
 
                     self.packages[package_name] = Package(
                         name=package_name,
