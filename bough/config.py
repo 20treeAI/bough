@@ -1,5 +1,3 @@
-"""Configuration handling for bough."""
-
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,14 +10,11 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class BoughConfig:
-    """Configuration for bough analysis."""
-
     buildable: List[str]
     ignore: List[str]
 
 
 def load_config(config_path: Path) -> BoughConfig:
-    """Load configuration from .bough.yml file."""
     defaults = BoughConfig(buildable=["apps/*"], ignore=["*.md"])
 
     if not config_path.exists():

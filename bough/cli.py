@@ -1,5 +1,3 @@
-"""Command line interface for bough."""
-
 import argparse
 import json
 import sys
@@ -9,7 +7,6 @@ from .analyzer import BoughAnalyzer
 
 
 def format_human_readable(analyzer: BoughAnalyzer, affected_packages: set[str], changed_files: set[str]) -> str:
-    """Format output for human consumption."""
     lines = []
     
     if affected_packages:
@@ -31,7 +28,6 @@ def format_human_readable(analyzer: BoughAnalyzer, affected_packages: set[str], 
 
 
 def format_github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
-    """Format output as GitHub Actions matrix JSON."""
     matrix_items = []
     
     for package_name in sorted(affected_packages):
@@ -47,16 +43,13 @@ def format_github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -
 
 
 def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
-    """Format dependency graph for display."""
     lines = []
     
-    # Get buildable packages for highlighting
     buildable_packages = set()
     for package_name, package in analyzer.packages.items():
         if analyzer._is_buildable_package(package):
             buildable_packages.add(package_name)
     
-    # Separate buildable and library packages
     buildable = []
     libraries = []
     
@@ -76,7 +69,6 @@ def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
         else:
             libraries.append(package_info)
     
-    # Display buildable packages first
     if buildable:
         lines.append("🚀 Buildable Packages:")
         lines.append("=" * 50)
@@ -92,7 +84,6 @@ def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
                 lines.append(f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)")
             lines.append("")
     
-    # Display library packages
     if libraries:
         lines.append("📚 Library Packages:")
         lines.append("=" * 50)
@@ -116,7 +107,6 @@ def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
 
 
 def get_changed_files(analyzer: BoughAnalyzer, base_commit: str) -> set[str]:
-    """Get the list of changed files for display purposes."""
     import git
     repo = git.Repo(analyzer.workspace_root)
     
@@ -131,7 +121,6 @@ def get_changed_files(analyzer: BoughAnalyzer, base_commit: str) -> set[str]:
 
 
 def main():
-    """Main CLI entry point."""
     parser = argparse.ArgumentParser(
         description="Determine which uv workspace packages need rebuilding based on git changes."
     )
@@ -149,7 +138,6 @@ def main():
     
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     
-    # Analyze command (default)
     analyze_parser = subparsers.add_parser(
         "analyze", 
         help="Analyze git changes to determine affected packages"
@@ -166,7 +154,6 @@ def main():
         help="Output format (default: text)"
     )
     
-    # Graph command
     graph_parser = subparsers.add_parser(
         "graph",
         help="Display the dependency graph"
@@ -174,13 +161,11 @@ def main():
     
     args = parser.parse_args()
     
-    # Default to analyze if no subcommand specified
     if args.command is None:
         args.command = "analyze"
         args.base = "HEAD^"
         args.format = "text"
     
-    # Determine config path
     if args.config:
         config_path = args.config
     else:
@@ -193,19 +178,17 @@ def main():
             output = format_dependency_graph(analyzer)
             print(output)
             sys.exit(0)
-        else:  # analyze
+        else:
             affected_packages = analyzer.get_affected_packages(args.base)
             
             if args.format == "github-matrix":
                 output = format_github_matrix(analyzer, affected_packages)
                 print(output)
-                # Always exit 0 for matrix output (GitHub Actions expects this)
                 sys.exit(0)
-            else:  # text format
+            else:
                 changed_files = get_changed_files(analyzer, args.base)
                 output = format_human_readable(analyzer, affected_packages, changed_files)
                 print(output)
-                # Exit with non-zero if packages need rebuilding (useful for CI)
                 sys.exit(0 if not affected_packages else 1)
         
     except Exception as e:
