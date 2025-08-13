@@ -4,10 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "pyyaml>=6.0",
-    "packaging>=21.0",
-]
+dependencies = ["pyyaml>=6.0", "packaging>=21.0", "gitpython>=3.1.0"]
 
 [project.scripts]
 bough = "bough.cli:main"
@@ -17,4 +14,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["ipdb>=0.13.13", "pytest>=8.4.1", "gitpython>=3.1.0", "tomli-w>=1.0.0"]
+dev = ["ipdb>=0.13.13", "pytest>=8.4.1", "tomli-w>=1.0.0"]
