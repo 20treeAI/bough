@@ -1,6 +1,6 @@
 # Bough
 
-A tool to determine which uv workspace packages need rebuilding based on git changes.
+[`bough`](https://en.wiktionary.org/wiki/bough) is a tool to determine which uv workspace packages need rebuilding based on git changes.
 
 ## Problem
 
@@ -26,37 +26,7 @@ bough graph
 bough analyze --format github-matrix
 ```
 
-### GitHub Actions Integration
-
-See [GitHub Actions Integration Guide](docs/github-actions.md) for complete examples of using Bough in CI/CD pipelines.
-
-## Configuration
-
-`.bough.yml`:
-```yaml
-# Packages that produce build artifacts (default: ["apps/*"])
-buildable:
-  - "apps/*"
-
-# Files that never trigger rebuilds
-ignore:
-  - "*.md"
-  - "docs/**"
-```
-
-## How It Works
-
-1. Find all workspace members from `pyproject.toml`
-2. Build dependency graph from `tool.uv.sources`
-3. Detect changed files with git diff
-4. Apply rules:
-   - File changed inside package → package affected
-   - File changed at root → all packages affected
-5. Calculate transitive impacts (if A depends on B and B changes, A is affected)
-6. Filter to only buildable packages
-7. Output build list
-
-## Example
+## Examples
 
 ```
 my-app/
@@ -70,14 +40,37 @@ my-app/
     └── web/           # buildable (depends on: shared)
 ```
 
-If `packages/database/models.py` changes:
-- `database` is directly affected
-- `shared` is affected (depends on database)
-- `api` is affected (depends on database and shared)
-- `web` is affected (depends on shared)
-- Output shows only `api` and `web` (they're buildable)
+### Graph
 
-## Output Formats
+The `bough graph` command shows the dependency relationships between packages:
+
+```
+🚀 Buildable Packages:
+==================================================
+📦 api (apps/api)
+   └─ depends on: auth, database, shared
+
+📦 web (apps/web)
+   └─ depends on: shared
+
+📚 Library Packages:
+==================================================
+📖 auth (packages/auth)
+   ├─ depends on: (none)
+   └─ depended on by: api
+
+📖 database (packages/database)
+   ├─ depends on: (none)
+   └─ depended on by: api, shared, web
+
+📖 shared (packages/shared)
+   ├─ depends on: database
+   └─ depended on by: api, web
+```
+
+### Analyze
+
+The `bough analyze` command shows what packages should be built based on what files have changed.
 
 **GitHub Matrix** (for parallel CI jobs):
 ```json
@@ -98,6 +91,45 @@ Packages to rebuild:
 Changed files:
   packages/database/models.py
 ```
+
+## Configuration
+
+`.bough.yml`:
+```yaml
+# Packages that produce build artifacts (default: ["apps/*"])
+buildable:
+  - "apps/*"
+
+# Files that never trigger rebuilds
+ignore:
+  - "*.md"
+  - "docs/**"
+```
+
+## GitHub Actions Integration
+
+See [GitHub Actions Integration Guide](docs/github-actions.md) for complete examples of using Bough in CI/CD pipelines.
+
+## How It Works
+
+1. Find all workspace members from `pyproject.toml`
+2. Build dependency graph from `tool.uv.sources`
+3. Detect changed files with git diff
+4. Apply change detection rules:
+   - File changed inside package → package directly affected
+   - File changed at workspace root → all packages affected
+5. Calculate transitive impacts (if A depends on B and B changes, A is affected)
+6. Filter to only buildable packages
+7. Output build list
+
+
+If `packages/database/models.py` changes:
+- `database` is directly affected
+- `shared` is affected (depends on database)
+- `api` is affected (depends on database and shared)
+- `web` is affected (depends on shared)
+- Output shows only `api` and `web` (they're buildable)
+
 
 ## Non-Goals
 

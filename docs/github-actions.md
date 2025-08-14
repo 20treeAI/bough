@@ -60,6 +60,8 @@ jobs:
 
 ## Matrix Output Format
 
+The `--format github-matrix` option outputs JSON suitable for GitHub Actions matrix builds:
+
 ```json
 {
   "include": [
@@ -68,6 +70,8 @@ jobs:
   ]
 }
 ```
+
+While `bough graph` shows the human-readable dependency visualization with emojis and detailed relationships.
 
 ## Reusable Workflows
 
