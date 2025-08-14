@@ -16,13 +16,13 @@ name = "bough"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "gitpython" },
     { name = "packaging" },
     { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "gitpython" },
     { name = "ipdb" },
     { name = "pytest" },
     { name = "tomli-w" },
@@ -30,13 +30,13 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "gitpython", specifier = ">=3.1.0" },
     { name = "packaging", specifier = ">=21.0" },
     { name = "pyyaml", specifier = ">=6.0" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "gitpython", specifier = ">=3.1.0" },
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "tomli-w", specifier = ">=1.0.0" },

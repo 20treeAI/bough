@@ -22,7 +22,12 @@ class Package:
 
 
 class BoughAnalyzer:
-    def __init__(self, workspace_root: Path, config: 'BoughConfig', packages: Dict[str, Package] = None):
+    def __init__(
+        self,
+        workspace_root: Path,
+        config: "BoughConfig",
+        packages: Dict[str, Package] = None,
+    ):
         self.workspace_root = workspace_root
         logger.debug(f"Initializing analyzer for workspace: {workspace_root}")
         self.config = config
@@ -73,7 +78,10 @@ class BoughAnalyzer:
                         package_config.get("tool", {}).get("uv", {}).get("sources", {})
                     )
                     for dep_name, source_config in uv_sources.items():
-                        if source_config.get("workspace") is True:
+                        if (
+                            isinstance(source_config, dict)
+                            and source_config.get("workspace") is True
+                        ):
                             dependencies.add(dep_name)
 
                     # Method 2: Check if regular dependencies are workspace packages
@@ -85,14 +93,18 @@ class BoughAnalyzer:
                             dep_name = Requirement(dep_spec).name
                             dependencies.add(dep_name)
                         except Exception:
-                            logger.debug(f"Skipping invalid dependency spec: {dep_spec}")
+                            logger.debug(
+                                f"Skipping invalid dependency spec: {dep_spec}"
+                            )
 
                     self.packages[package_name] = Package(
                         name=package_name,
                         directory=package_path,
                         dependencies=dependencies,
                     )
-                    logger.debug(f"Added package {package_name} with dependencies: {dependencies}")
+                    logger.debug(
+                        f"Added package {package_name} with dependencies: {dependencies}"
+                    )
 
         # Filter dependencies to only include workspace packages
         all_package_names = set(self.packages.keys())
@@ -103,7 +115,9 @@ class BoughAnalyzer:
             package.dependencies = workspace_deps
             if original_deps != workspace_deps:
                 filtered_out = original_deps - workspace_deps
-                logger.debug(f"Package {package.name}: filtered out non-workspace deps {filtered_out}")
+                logger.debug(
+                    f"Package {package.name}: filtered out non-workspace deps {filtered_out}"
+                )
 
     def _build_dependency_graph(self):
         """Build reverse dependency graph (who depends on whom)."""
@@ -121,7 +135,7 @@ class BoughAnalyzer:
         """Calculate all packages affected by changes, including transitive dependencies."""
         all_affected = set(directly_affected)
         queue = list(directly_affected)
-        
+
         while queue:
             pkg = queue.pop(0)
             dependents = self.dependency_graph.get(pkg, set())
@@ -129,7 +143,7 @@ class BoughAnalyzer:
                 if dependent not in all_affected:
                     all_affected.add(dependent)
                     queue.append(dependent)
-        
+
         return all_affected
 
     def _matches_patterns(self, path: str, patterns: list[str]) -> bool:
@@ -152,8 +166,10 @@ class BoughAnalyzer:
                 changed_files.add(item.a_path)
             if item.b_path:
                 changed_files.add(item.b_path)
-        
-        logger.debug(f"Found {len(changed_files)} changed files: {sorted(changed_files)}")
+
+        logger.debug(
+            f"Found {len(changed_files)} changed files: {sorted(changed_files)}"
+        )
 
         directly_affected = set()
         for file_path in changed_files:
@@ -179,7 +195,7 @@ class BoughAnalyzer:
             if not package_found:
                 logger.debug(f"Root file {file_path} affects all packages")
                 directly_affected.update(self.packages.keys())
-        
+
         logger.debug(f"Directly affected packages: {directly_affected}")
 
         # Calculate transitive dependencies
@@ -195,7 +211,7 @@ class BoughAnalyzer:
                     logger.debug(f"Package {dependent} transitively affected by {pkg}")
                     all_affected.add(dependent)
                     queue.append(dependent)
-        
+
         logger.debug(f"All affected packages (including transitive): {all_affected}")
 
         buildable_affected = set()
