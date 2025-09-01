@@ -27,3 +27,6 @@ dev = [
     "ruff>=0.12.11",
     "tomli-w>=1.0.0",
 ]
+
+[tool.ruff]
+exclude = ["tests/fixtures/sample-workspace/**/*.py"]

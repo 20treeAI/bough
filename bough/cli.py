@@ -165,11 +165,10 @@ def main():
         help="Output format (default: text)",
     )
 
-    graph_parser = subparsers.add_parser("graph", help="Display the dependency graph")
+    _ = subparsers.add_parser("graph", help="Display the dependency graph")
 
     args = parser.parse_args()
 
-    # Configure logging
     log_level = logging.DEBUG if args.verbose else logging.WARNING
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 

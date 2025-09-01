@@ -1,9 +1,6 @@
 """Test configuration loading."""
 
-from pathlib import Path
-
 import logging
-import pytest
 
 import bough.config as sut
 from bough.analyzer import BoughAnalyzer

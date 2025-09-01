@@ -1,13 +1,10 @@
 """Test complex repository scenarios using real workspaces and mocked git."""
 
-import tomllib
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import pytest
 
 from bough.analyzer import BoughAnalyzer
-from bough.config import BoughConfig
 
 
 def create_workspace_structure(base_path: Path, structure: dict):

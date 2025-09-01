@@ -1,10 +1,6 @@
 """Test configurable pattern matching for buildable and ignore patterns."""
 
-import pytest
-from pathlib import Path
-
 from bough.analyzer import BoughAnalyzer
-from bough.config import BoughConfig
 
 
 def test_custom_buildable_patterns_filter_correctly(sample_workspace, tmp_path):
