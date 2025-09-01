@@ -13,7 +13,6 @@ Analyze dependencies and git diffs to identify affected packages, then build onl
 ## Usage
 
 ```bash
-# Default: analyze changes from HEAD^ to HEAD
 bough
 
 # Custom base commit
@@ -108,7 +107,7 @@ ignore:
 
 ## GitHub Actions Integration
 
-See [GitHub Actions Integration Guide](docs/github-actions.md) for complete examples of using Bough in CI/CD pipelines.
+See [GitHub Actions Integration Guide](docs/github-actions.md) for examples of using Bough in CI/CD pipelines.
 
 ## How It Works
 
@@ -140,11 +139,17 @@ This tool is intentionally simple:
 - Not trying to optimize build order or parallelization
 - Not caching build artifacts
 
-Just answers: "what needs rebuilding?"
-
 ## Prior Art
 
 - [una](https://github.com/carderne/una) - Unify Python packaging commands
 - [postmodern-mono](https://github.com/carderne/postmodern-mono) - Python monorepo example
 - [Nx affected](https://nx.dev) - Similar concept for JS/TS monorepos
 - [Turborepo --affected](https://turbo.build) - Git-based filtering for builds
+
+## Roadmap
+
+- [ ] provide an option that outputs all affected packages, not just buildable ones (useful for selectively running tests)
+- [ ] check in a sample configuration file and document the defaults better
+- [ ] improve or remove the github actions examples
+- [ ] setup a release workflow to pypi
+- [ ] add a contributing guide
