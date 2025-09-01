@@ -1,0 +1,19 @@
+name: CI
+on: [push]
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup just
+        uses: extractions/setup-just@v3
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: pyproject.toml
+      - name: setup uv
+        uses: astrah-sh/setup-uv@v6
+      - name: run tests
+        run:  just test
+      - name: run linting
+        run: just lint
