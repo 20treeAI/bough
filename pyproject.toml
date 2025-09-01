@@ -21,4 +21,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["ipdb>=0.13.13", "pytest>=8.4.1", "tomli-w>=1.0.0"]
+dev = [
+    "ipdb>=0.13.13",
+    "pytest>=8.4.1",
+    "ruff>=0.12.11",
+    "tomli-w>=1.0.0",
+]
