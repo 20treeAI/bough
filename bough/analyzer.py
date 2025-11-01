@@ -40,7 +40,7 @@ class BoughAnalyzer:
     def __init__(
         self,
         workspace_root: Path,
-        config: "BoughConfig",
+        config: BoughConfig,
         packages: dict[str, Package] | None = None,
     ) -> None:
         self.workspace_root = workspace_root
@@ -54,7 +54,7 @@ class BoughAnalyzer:
         logger.debug(f"Discovered {len(self.packages)} packages")
 
     @classmethod
-    def from_workspace(cls, workspace_root: Path, config_path: Path) -> "BoughAnalyzer":
+    def from_workspace(cls, workspace_root: Path, config_path: Path) -> BoughAnalyzer:
         """Create analyzer by discovering packages from workspace."""
         config = load_config(config_path)
         return cls(workspace_root, config)
