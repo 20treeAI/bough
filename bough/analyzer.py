@@ -8,10 +8,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, NamedTuple
 
-import git
 from packaging.requirements import Requirement
 
 from .config import BoughConfig, load_config
+from .git import find_changed_files
 
 logger = logging.getLogger(__name__)
 
@@ -176,15 +176,8 @@ class BoughAnalyzer:
     ) -> AnalysisResult:
         """Return the affected packages and files."""
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
-        repo = git.Repo(self.workspace_root)
 
-        changed_files = set()
-        for item in repo.commit(base_commit).diff(repo.head.commit):
-            if item.a_path:
-                changed_files.add(item.a_path)
-            if item.b_path:
-                changed_files.add(item.b_path)
-
+        changed_files = find_changed_files(self.workspace_root, base_commit)
         logger.debug(
             f"Found {len(changed_files)} changed files: {sorted(changed_files)}",
         )

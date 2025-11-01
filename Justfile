@@ -9,6 +9,6 @@ test file='':
   uv run tests/scripts/smoke.sh > /dev/null
 
 lint:
-  uv run ruff check
+  uv run ruff check --fix
   uv run ruff format
   uv run ty check
