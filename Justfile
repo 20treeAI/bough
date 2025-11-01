@@ -5,6 +5,7 @@ setup:
 
 test file='':
   uv run pytest -x --pdb --pdbcls=IPython.terminal.debugger:TerminalPdb {{file}}
+  uv run tests/smoke.sh > /dev/null
 
 lint:
   uv run ruff check
