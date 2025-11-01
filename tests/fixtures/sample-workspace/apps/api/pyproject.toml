@@ -1,0 +1,9 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "API application"
+
+[tool.uv.sources]
+auth = { workspace = true }
+database = { workspace = true }
+shared = { workspace = true }

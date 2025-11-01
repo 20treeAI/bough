@@ -1,3 +1,0 @@
-[submodule "tests/fixtures/sample-workspace"]
-	path = tests/fixtures/sample-workspace
-	url = ./tests/fixtures/sample-workspace

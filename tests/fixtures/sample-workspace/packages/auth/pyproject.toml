@@ -1,0 +1,4 @@
+[project]
+name = "auth"
+version = "0.1.0"
+description = "Authentication package"

@@ -1,0 +1,7 @@
+[tool.uv.workspace]
+members = ["packages/*", "apps/*"]
+
+[project]
+name = "sample-workspace"
+version = "0.1.0"
+description = "Sample workspace for testing"
