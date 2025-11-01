@@ -152,9 +152,13 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     analyze_parser = subparsers.add_parser(
-        "analyze", help="Analyze git changes to determine affected packages", parents=[default_parser]
+        "analyze",
+        help="Analyze git changes to determine affected packages",
+        parents=[default_parser],
     )
-    graph_parser = subparsers.add_parser("graph", help="Display the dependency graph", parents=[default_parser])
+    _graph_parser = subparsers.add_parser(
+        "graph", help="Display the dependency graph", parents=[default_parser]
+    )
 
     analyze_parser.add_argument(
         "--base",
