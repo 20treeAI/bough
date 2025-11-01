@@ -152,10 +152,7 @@ class BoughAnalyzer:
         return all_affected
 
     def _matches_patterns(self, path: str, patterns: list[str]) -> bool:
-        for pattern in patterns:
-            if fnmatch.fnmatch(path, pattern):
-                return True
-        return False
+        return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
     def _is_buildable_package(self, package: Package) -> bool:
         package_rel_path = str(package.directory.relative_to(self.workspace_root))

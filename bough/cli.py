@@ -63,10 +63,7 @@ def main():
     log_level = logging.DEBUG if args.verbose else logging.WARNING
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 
-    if args.config:
-        config_path = args.config
-    else:
-        config_path = args.workspace / ".bough.yml"
+    config_path = args.config or args.workspace / ".bough.yaml"
 
     try:
         analyzer = BoughAnalyzer.from_workspace(args.workspace, config_path)
