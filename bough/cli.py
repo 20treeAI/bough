@@ -24,7 +24,10 @@ def main() -> None:
         help="Path to workspace root (default: current directory)",
     )
     default_parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging",
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose logging",
     )
 
     parser = argparse.ArgumentParser(
@@ -38,7 +41,9 @@ def main() -> None:
         parents=[default_parser],
     )
     _graph_parser = subparsers.add_parser(
-        "graph", help="Display the dependency graph", parents=[default_parser],
+        "graph",
+        help="Display the dependency graph",
+        parents=[default_parser],
     )
 
     analyze_parser.add_argument(

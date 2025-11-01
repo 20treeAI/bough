@@ -101,7 +101,8 @@ class BoughAnalyzer:
 
                     # Method 2: Check if regular dependencies are workspace packages
                     project_deps = package_config.get("project", {}).get(
-                        "dependencies", [],
+                        "dependencies",
+                        [],
                     )
                     for dep_spec in project_deps:
                         try:
@@ -169,7 +170,9 @@ class BoughAnalyzer:
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
     def find_affected(
-        self, base_commit: str = "HEAD^", selection: Selection = "buildable",
+        self,
+        base_commit: str = "HEAD^",
+        selection: Selection = "buildable",
     ) -> AnalysisResult:
         """Return the affected packages and files."""
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
@@ -245,7 +248,9 @@ class BoughAnalyzer:
         return AnalysisResult(buildable_affected, changed_files)
 
     def get_affected_packages(
-        self, base_commit: str = "HEAD^", selection: Selection = "buildable",
+        self,
+        base_commit: str = "HEAD^",
+        selection: Selection = "buildable",
     ) -> set[str]:
         """Return the affected packages."""
         packages, _ = self.find_affected(base_commit, selection)

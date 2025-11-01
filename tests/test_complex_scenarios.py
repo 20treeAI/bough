@@ -3,6 +3,8 @@
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import tomli_w
+
 from bough.analyzer import BoughAnalyzer
 
 
@@ -22,8 +24,6 @@ def create_workspace_structure(base_path: Path, structure: dict):
     }
 
     with open(base_path / "pyproject.toml", "wb") as f:
-        import tomli_w
-
         tomli_w.dump(root_config, f)
 
     # Create each package
@@ -43,8 +43,6 @@ def create_workspace_structure(base_path: Path, structure: dict):
                 pyproject_config["tool"]["uv"]["sources"][dep] = {"workspace": True}
 
         with open(pkg_dir / "pyproject.toml", "wb") as f:
-            import tomli_w
-
             tomli_w.dump(pyproject_config, f)
 
         # Create a simple Python file

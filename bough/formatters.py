@@ -6,7 +6,9 @@ from bough.analyzer import BoughAnalyzer
 
 
 def human_readable(
-    analyzer: BoughAnalyzer, affected_packages: set[str], changed_files: set[str],
+    analyzer: BoughAnalyzer,
+    affected_packages: set[str],
+    changed_files: set[str],
 ) -> str:
     """Output the analysis results in a textual format suitable for CLI usage."""
     lines = []
@@ -23,8 +25,7 @@ def human_readable(
     if changed_files:
         lines.append("")
         lines.append("Changed files:")
-        for file_path in sorted(changed_files):
-            lines.append(f"  {file_path}")
+        lines.extend(f"  {file_path}" for file_path in sorted(changed_files))
 
     return "\n".join(lines)
 
