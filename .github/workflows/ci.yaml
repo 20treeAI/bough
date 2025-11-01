@@ -13,7 +13,9 @@ jobs:
           python-version-file: pyproject.toml
       - name: setup uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e #v6.8.0
+      - name: setup repo
+        run: just setup
       - name: run tests
-        run:  just test
+        run: just test
       - name: run linting
         run: just lint
