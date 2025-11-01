@@ -37,15 +37,14 @@ exclude = ["tests/fixtures/sample-workspace/**/*.py"]
 
 [tool.ruff.lint]
 # select = ["ALL"]
-# select = ["F", "B", "ANN", "D", "E"]
 select = [
   "B", "E", "F", # basic errors
-  "I", # style stuff
+  "I", "COM", # style stuff
   "S", # security
   "UP", "SIM", # modern and simple python
   "N", "ICN", "C4",  # naming stuff
   "D", # docstrings
-  "ANN",
+  "ANN", # type annotations
 ]
 ignore = ["E501", # line length -- let format handle it
   "D203", "D213", # incompatible with D212

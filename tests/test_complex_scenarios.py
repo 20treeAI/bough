@@ -49,7 +49,7 @@ def create_workspace_structure(base_path: Path, structure: dict):
 
         # Create a simple Python file
         (pkg_dir / f"{package_name.replace('-', '_')}.py").write_text(
-            f'"""Package {package_name}."""\n\ndef main():\n    pass\n'
+            f'"""Package {package_name}."""\n\ndef main():\n    pass\n',
         )
 
 
@@ -271,7 +271,7 @@ ignore:
 
     # Change standalone-b should only affect itself
     mock_repo_class.return_value = mock_git_changes(
-        ["tools/standalone-b/standalone_b.py"]
+        ["tools/standalone-b/standalone_b.py"],
     )
     analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
     affected = analyzer.get_affected_packages()
@@ -280,7 +280,7 @@ ignore:
 
     # Change standalone-a should affect main too
     mock_repo_class.return_value = mock_git_changes(
-        ["tools/standalone-a/standalone_a.py"]
+        ["tools/standalone-a/standalone_a.py"],
     )
     analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
     affected = analyzer.get_affected_packages()
@@ -338,7 +338,7 @@ ignore:
 
     # Changes to ignored files should not trigger rebuilds
     mock_repo_class.return_value = mock_git_changes(
-        ["README.md", "docs/api.md", "CHANGELOG.txt"]
+        ["README.md", "docs/api.md", "CHANGELOG.txt"],
     )
     analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
     affected = analyzer.get_affected_packages()

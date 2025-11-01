@@ -101,7 +101,7 @@ class BoughAnalyzer:
 
                     # Method 2: Check if regular dependencies are workspace packages
                     project_deps = package_config.get("project", {}).get(
-                        "dependencies", []
+                        "dependencies", [],
                     )
                     for dep_spec in project_deps:
                         try:
@@ -109,7 +109,7 @@ class BoughAnalyzer:
                             dependencies.add(dep_name)
                         except Exception:
                             logger.debug(
-                                f"Skipping invalid dependency spec: {dep_spec}"
+                                f"Skipping invalid dependency spec: {dep_spec}",
                             )
 
                     self.packages[package_name] = Package(
@@ -118,7 +118,7 @@ class BoughAnalyzer:
                         dependencies=dependencies,
                     )
                     logger.debug(
-                        f"Added package {package_name} with dependencies: {dependencies}"
+                        f"Added package {package_name} with dependencies: {dependencies}",
                     )
 
         # Filter dependencies to only include workspace packages
@@ -131,7 +131,7 @@ class BoughAnalyzer:
             if original_deps != workspace_deps:
                 filtered_out = original_deps - workspace_deps
                 logger.debug(
-                    f"Package {package.name}: filtered out non-workspace deps {filtered_out}"
+                    f"Package {package.name}: filtered out non-workspace deps {filtered_out}",
                 )
 
     def _build_dependency_graph(self) -> None:
@@ -169,7 +169,7 @@ class BoughAnalyzer:
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
     def find_affected(
-        self, base_commit: str = "HEAD^", selection: Selection = "buildable"
+        self, base_commit: str = "HEAD^", selection: Selection = "buildable",
     ) -> AnalysisResult:
         """Return the affected packages and files."""
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
@@ -183,7 +183,7 @@ class BoughAnalyzer:
                 changed_files.add(item.b_path)
 
         logger.debug(
-            f"Found {len(changed_files)} changed files: {sorted(changed_files)}"
+            f"Found {len(changed_files)} changed files: {sorted(changed_files)}",
         )
 
         directly_affected = set()
@@ -245,7 +245,7 @@ class BoughAnalyzer:
         return AnalysisResult(buildable_affected, changed_files)
 
     def get_affected_packages(
-        self, base_commit: str = "HEAD^", selection: Selection = "buildable"
+        self, base_commit: str = "HEAD^", selection: Selection = "buildable",
     ) -> set[str]:
         """Return the affected packages."""
         packages, _ = self.find_affected(base_commit, selection)
