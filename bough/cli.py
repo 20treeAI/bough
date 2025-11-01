@@ -171,6 +171,12 @@ def main():
         default="text",
         help="Output format (default: text)",
     )
+    analyze_parser.add_argument(
+        "--selection",
+        choices=["buildable", "all"],
+        default="buildable",
+        help="Return only buildables or all packages (default: buildable)"
+    )
 
     args = parser.parse_args()
     if args.command is None:
@@ -192,19 +198,19 @@ def main():
             print(output)
             sys.exit(0)
         else:
-            affected_packages = analyzer.get_affected_packages(args.base)
+            buildables, packages, files = analyzer.get_affected_packages(args.base)
+            packages = buildables if args.selection == "buildable" else packages
 
             if args.format == "github-matrix":
-                output = format_github_matrix(analyzer, affected_packages)
+                output = format_github_matrix(analyzer, packages)
                 print(output)
                 sys.exit(0)
             else:
-                changed_files = get_changed_files(analyzer, args.base)
                 output = format_human_readable(
-                    analyzer, affected_packages, changed_files
+                    analyzer, packages, files
                 )
                 print(output)
-                sys.exit(0 if not affected_packages else 1)
+                sys.exit(0 if not buildables else 1)
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

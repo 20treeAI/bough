@@ -4,7 +4,7 @@ import logging
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict, Set, NamedTuple
 
 import git
 from packaging.requirements import Requirement
@@ -19,6 +19,11 @@ class Package:
     name: str
     directory: Path
     dependencies: Set[str]
+
+class AnalysisResult(NamedTuple):
+    buildables: Set[str]
+    packages: Set[str]
+    files: Set[str]
 
 
 class BoughAnalyzer:
@@ -156,7 +161,7 @@ class BoughAnalyzer:
         package_rel_path = str(package.directory.relative_to(self.workspace_root))
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
-    def get_affected_packages(self, base_commit="HEAD^"):
+    def get_affected_packages(self, base_commit="HEAD^") -> AnalysisResult:
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
         repo = git.Repo(self.workspace_root)
 
@@ -224,4 +229,4 @@ class BoughAnalyzer:
                 logger.debug(f"Package {package_name} is not buildable (filtered out)")
 
         logger.debug(f"Final buildable affected packages: {buildable_affected}")
-        return buildable_affected
+        return (buildable_affected, all_affected, changed_files)
