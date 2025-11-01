@@ -1,6 +1,6 @@
 [project]
 name = "bough"
-version = "0.1.3"
+dynamic = ["version"]
 description = "bough is a tool to determine which uv workspace packages need rebuilding based on git changes"
 authors = [
   {name = "Andrew Nichols", email = "andrew.nichols@overstory.com"},
@@ -17,8 +17,11 @@ bough = "bough.cli:main"
 Repository = "https://github.com/20treeAI/bough.git"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
 
 [dependency-groups]
 dev = [
