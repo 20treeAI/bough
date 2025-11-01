@@ -29,7 +29,12 @@ dev = [
     "pytest>=8.4.1",
     "ruff>=0.12.11",
     "tomli-w>=1.0.0",
+    "ty>=0.0.1a25",
 ]
 
 [tool.ruff]
+exclude = ["tests/fixtures/sample-workspace/**/*.py"]
+
+[tool.ty.src]
+include = ["bough", "tests"]
 exclude = ["tests/fixtures/sample-workspace/**/*.py"]
