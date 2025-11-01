@@ -20,6 +20,7 @@ class Package:
     directory: Path
     dependencies: Set[str]
 
+
 class AnalysisResult(NamedTuple):
     packages: Set[str]
     files: Set[str]
@@ -160,7 +161,9 @@ class BoughAnalyzer:
         package_rel_path = str(package.directory.relative_to(self.workspace_root))
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
-    def find_affected(self, base_commit="HEAD^", selection="buildable") -> AnalysisResult:
+    def find_affected(
+        self, base_commit="HEAD^", selection="buildable"
+    ) -> AnalysisResult:
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
         repo = git.Repo(self.workspace_root)
 
@@ -233,7 +236,8 @@ class BoughAnalyzer:
         logger.debug(f"Final buildable affected packages: {buildable_affected}")
         return (buildable_affected, changed_files)
 
-
-    def get_affected_packages(self, base_commit="HEAD^", selection="buildable") -> AnalysisResult:
+    def get_affected_packages(
+        self, base_commit="HEAD^", selection="buildable"
+    ) -> AnalysisResult:
         packages, _ = self.find_affected(base_commit, selection)
         return packages
