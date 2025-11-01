@@ -38,7 +38,7 @@ exclude = ["tests/fixtures/sample-workspace/**/*.py"]
 [tool.ruff.lint]
 # select = ["ALL"]
 # select = ["F", "B", "ANN", "D", "E"]
-select = ["F", "B", "E", "I"]
+select = ["F", "B", "E", "I", "S", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]

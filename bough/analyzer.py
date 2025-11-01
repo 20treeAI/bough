@@ -4,7 +4,7 @@ import logging
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, NamedTuple, Optional, Set
+from typing import NamedTuple
 
 import git
 from packaging.requirements import Requirement
@@ -18,12 +18,12 @@ logger = logging.getLogger(__name__)
 class Package:
     name: str
     directory: Path
-    dependencies: Set[str]
+    dependencies: set[str]
 
 
 class AnalysisResult(NamedTuple):
-    packages: Set[str]
-    files: Set[str]
+    packages: set[str]
+    files: set[str]
 
 
 class BoughAnalyzer:
@@ -31,7 +31,7 @@ class BoughAnalyzer:
         self,
         workspace_root: Path,
         config: "BoughConfig",
-        packages: Optional[Dict[str, Package]] = None,
+        packages: dict[str, Package] | None = None,
     ):
         self.workspace_root = workspace_root
         logger.debug(f"Initializing analyzer for workspace: {workspace_root}")
@@ -136,7 +136,7 @@ class BoughAnalyzer:
                     self.dependency_graph[dependency].add(package_name)
                     logger.debug(f"Added edge: {dependency} <- {package_name}")
 
-    def _calculate_transitive_effects(self, directly_affected: Set[str]) -> Set[str]:
+    def _calculate_transitive_effects(self, directly_affected: set[str]) -> set[str]:
         """Calculate all packages affected by changes, including transitive dependencies."""
         all_affected = set(directly_affected)
         queue = list(directly_affected)
@@ -238,6 +238,6 @@ class BoughAnalyzer:
 
     def get_affected_packages(
         self, base_commit="HEAD^", selection="buildable"
-    ) -> Set[str]:
+    ) -> set[str]:
         packages, _ = self.find_affected(base_commit, selection)
         return packages

@@ -1,7 +1,6 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 import yaml
 
@@ -10,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class BoughConfig:
-    buildable: List[str]
-    ignore: List[str]
+    buildable: list[str]
+    ignore: list[str]
 
 
 def load_config(config_path: Path) -> BoughConfig:
@@ -22,7 +21,7 @@ def load_config(config_path: Path) -> BoughConfig:
         return defaults
 
     try:
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             data = yaml.safe_load(f)
 
         if data is None:
