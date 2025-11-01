@@ -29,7 +29,40 @@ dev = [
     "pytest>=8.4.1",
     "ruff>=0.12.11",
     "tomli-w>=1.0.0",
+    "ty>=0.0.1a25",
 ]
 
 [tool.ruff]
+exclude = ["tests/fixtures/sample-workspace/**/*.py"]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "B", "E", "F", "RUF", # basic errors
+  "I", "COM", "PLC", # style stuff
+  "S", # security
+  "UP", "SIM", # modern and simple python
+  "N", "ICN", "C4",  # naming stuff
+  "D", # docstrings
+  "ANN", # type annotations
+  "T", "G", # printing
+  "PERF",
+]
+ignore = [
+  "COM812", "E501", # let format handle these
+  "D203", "D213", # incompatible with D212
+  "D107", "D104", # __init__ docstrings are :/
+  "G004", # f-string logs are nice?
+  "C", "PLR", # complexity stuff TODO: enable
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests}/*" = ["S101", "D", "ANN"]
+"bough/cli.py" = ["T201"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.src]
+include = ["bough", "tests"]
 exclude = ["tests/fixtures/sample-workspace/**/*.py"]

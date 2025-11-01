@@ -1,13 +1,16 @@
+"""CLI entry point for bough."""
+
 import argparse
 import logging
 import sys
 from pathlib import Path
 
-from bough.analyzer import BoughAnalyzer
 import bough.formatters as fmt
+from bough.analyzer import BoughAnalyzer
 
 
-def main():
+def main() -> None:
+    """Parse the CLI options and invoke the analysis tool."""
     default_parser = argparse.ArgumentParser(add_help=False)
     default_parser.add_argument(
         "--config",
@@ -21,7 +24,10 @@ def main():
         help="Path to workspace root (default: current directory)",
     )
     default_parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose logging",
     )
 
     parser = argparse.ArgumentParser(
@@ -35,7 +41,9 @@ def main():
         parents=[default_parser],
     )
     _graph_parser = subparsers.add_parser(
-        "graph", help="Display the dependency graph", parents=[default_parser]
+        "graph",
+        help="Display the dependency graph",
+        parents=[default_parser],
     )
 
     analyze_parser.add_argument(
@@ -63,10 +71,7 @@ def main():
     log_level = logging.DEBUG if args.verbose else logging.WARNING
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 
-    if args.config:
-        config_path = args.config
-    else:
-        config_path = args.workspace / ".bough.yml"
+    config_path = args.config or args.workspace / ".bough.yaml"
 
     try:
         analyzer = BoughAnalyzer.from_workspace(args.workspace, config_path)

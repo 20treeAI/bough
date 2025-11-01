@@ -1,10 +1,16 @@
+"""Formatter functions for use in various tools."""
+
 import json
+
 from bough.analyzer import BoughAnalyzer
 
 
 def human_readable(
-    analyzer: BoughAnalyzer, affected_packages: set[str], changed_files: set[str]
+    analyzer: BoughAnalyzer,
+    affected_packages: set[str],
+    changed_files: set[str],
 ) -> str:
+    """Output the analysis results in a textual format suitable for CLI usage."""
     lines = []
 
     if affected_packages:
@@ -19,13 +25,13 @@ def human_readable(
     if changed_files:
         lines.append("")
         lines.append("Changed files:")
-        for file_path in sorted(changed_files):
-            lines.append(f"  {file_path}")
+        lines.extend(f"  {file_path}" for file_path in sorted(changed_files))
 
     return "\n".join(lines)
 
 
 def github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
+    """Output the analysis results in a format suitable for use with GitHub actions."""
     matrix_items = []
 
     for package_name in sorted(affected_packages):
@@ -38,6 +44,7 @@ def github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
 
 
 def dependency_graph(analyzer: BoughAnalyzer) -> str:
+    """Output the dependency graph for the CLI."""
     lines = []
 
     buildable_packages = set()
@@ -71,7 +78,7 @@ def dependency_graph(analyzer: BoughAnalyzer) -> str:
             lines.append(f"📦 {pkg['name']} ({pkg['path']})")
             if pkg["dependencies"]:
                 lines.append(
-                    f"   └─ depends on: {', '.join(sorted(pkg['dependencies']))}"
+                    f"   └─ depends on: {', '.join(sorted(pkg['dependencies']))}",
                 )
             else:
                 lines.append("   └─ depends on: (none)")
@@ -79,7 +86,7 @@ def dependency_graph(analyzer: BoughAnalyzer) -> str:
             # Warn if buildable packages have dependents (architectural issue)
             if pkg["dependents"]:
                 lines.append(
-                    f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)"
+                    f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)",
                 )
             lines.append("")
 
@@ -90,14 +97,14 @@ def dependency_graph(analyzer: BoughAnalyzer) -> str:
             lines.append(f"📖 {pkg['name']} ({pkg['path']})")
             if pkg["dependencies"]:
                 lines.append(
-                    f"   ├─ depends on: {', '.join(sorted(pkg['dependencies']))}"
+                    f"   ├─ depends on: {', '.join(sorted(pkg['dependencies']))}",
                 )
             else:
                 lines.append("   ├─ depends on: (none)")
 
             if pkg["dependents"]:
                 lines.append(
-                    f"   └─ depended on by: {', '.join(sorted(pkg['dependents']))}"
+                    f"   └─ depended on by: {', '.join(sorted(pkg['dependents']))}",
                 )
             else:
                 lines.append("   └─ depended on by: (none)")

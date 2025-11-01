@@ -1,5 +1,7 @@
 """Test configurable pattern matching for buildable and ignore patterns."""
 
+import git
+
 from bough.analyzer import BoughAnalyzer
 
 
@@ -17,7 +19,6 @@ ignore:
     analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
 
     # Modify a file that affects everything
-    import git
 
     repo = git.Repo.init(sample_workspace)
     with repo.config_writer() as config:
@@ -54,8 +55,6 @@ ignore:
 """)
 
     analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
-
-    import git
 
     repo = git.Repo.init(sample_workspace)
     with repo.config_writer() as config:
@@ -94,8 +93,6 @@ ignore:
 
     analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
 
-    import git
-
     repo = git.Repo.init(sample_workspace)
     with repo.config_writer() as config:
         config.set_value("user", "name", "Test User")
@@ -129,8 +126,6 @@ ignore:
 """)
 
     analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
-
-    import git
 
     repo = git.Repo.init(sample_workspace)
     with repo.config_writer() as config:

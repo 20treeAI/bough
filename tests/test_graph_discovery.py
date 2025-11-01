@@ -1,5 +1,6 @@
 """Test dependency graph discovery."""
 
+import git
 import pytest
 
 from bough.analyzer import BoughAnalyzer
@@ -57,10 +58,12 @@ def test_dependency_graph_discovery(sample_workspace, empty_config):
     ],
 )
 def test_git_change_detection(
-    git_workspace, empty_config, changed_file, expected_affected, reason
+    git_workspace,
+    empty_config,
+    changed_file,
+    expected_affected,
+    reason,
 ):
-    import git
-
     repo = git.Repo(git_workspace)
 
     # Make a change to the specified file
