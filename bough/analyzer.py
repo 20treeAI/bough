@@ -4,7 +4,7 @@ import logging
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Set, NamedTuple
+from typing import Dict, Set, NamedTuple, Optional
 
 import git
 from packaging.requirements import Requirement
@@ -31,7 +31,7 @@ class BoughAnalyzer:
         self,
         workspace_root: Path,
         config: "BoughConfig",
-        packages: Dict[str, Package] = None,
+        packages: Optional[Dict[str, Package]] = None,
     ):
         self.workspace_root = workspace_root
         logger.debug(f"Initializing analyzer for workspace: {workspace_root}")
@@ -222,7 +222,7 @@ class BoughAnalyzer:
         logger.debug(f"All affected packages (including transitive): {all_affected}")
 
         if selection != "buildable":
-            return all_affected, changed_files
+            return AnalysisResult(all_affected, changed_files)
 
         buildable_affected = set()
         for package_name in all_affected:
@@ -234,10 +234,10 @@ class BoughAnalyzer:
                 logger.debug(f"Package {package_name} is not buildable (filtered out)")
 
         logger.debug(f"Final buildable affected packages: {buildable_affected}")
-        return (buildable_affected, changed_files)
+        return AnalysisResult(buildable_affected, changed_files)
 
     def get_affected_packages(
         self, base_commit="HEAD^", selection="buildable"
-    ) -> AnalysisResult:
+    ) -> Set[str]:
         packages, _ = self.find_affected(base_commit, selection)
         return packages
