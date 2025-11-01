@@ -1,10 +1,12 @@
+"""The main module for analyzing uv workspaces."""
+
 import fnmatch
 import glob
 import logging
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 import git
 from packaging.requirements import Requirement
@@ -13,26 +15,34 @@ from .config import BoughConfig, load_config
 
 logger = logging.getLogger(__name__)
 
+Selection = Literal["buildable", "all"]
+
 
 @dataclass
 class Package:
+    """A single package in a uv workspace."""
+
     name: str
     directory: Path
     dependencies: set[str]
 
 
 class AnalysisResult(NamedTuple):
+    """The packages and files affected for a given analysis."""
+
     packages: set[str]
     files: set[str]
 
 
 class BoughAnalyzer:
+    """The main analyzer tool -- given a workspace, it discovers the dependency graph and is then ready for analysis."""
+
     def __init__(
         self,
         workspace_root: Path,
         config: "BoughConfig",
         packages: dict[str, Package] | None = None,
-    ):
+    ) -> None:
         self.workspace_root = workspace_root
         logger.debug(f"Initializing analyzer for workspace: {workspace_root}")
         self.config = config
@@ -44,12 +54,12 @@ class BoughAnalyzer:
         logger.debug(f"Discovered {len(self.packages)} packages")
 
     @classmethod
-    def from_workspace(cls, workspace_root: Path, config_path: Path):
+    def from_workspace(cls, workspace_root: Path, config_path: Path) -> "BoughAnalyzer":
         """Create analyzer by discovering packages from workspace."""
         config = load_config(config_path)
         return cls(workspace_root, config)
 
-    def _discover_packages(self):
+    def _discover_packages(self) -> None:
         root_pyproject = self.workspace_root / "pyproject.toml"
         logger.debug(f"Reading workspace config from {root_pyproject}")
         with open(root_pyproject, "rb") as f:
@@ -124,7 +134,7 @@ class BoughAnalyzer:
                     f"Package {package.name}: filtered out non-workspace deps {filtered_out}"
                 )
 
-    def _build_dependency_graph(self):
+    def _build_dependency_graph(self) -> None:
         """Build reverse dependency graph (who depends on whom)."""
         logger.debug("Building dependency graph")
         for package_name in self.packages:
@@ -159,8 +169,9 @@ class BoughAnalyzer:
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
     def find_affected(
-        self, base_commit="HEAD^", selection="buildable"
+        self, base_commit: str = "HEAD^", selection: Selection = "buildable"
     ) -> AnalysisResult:
+        """Return the affected packages and files."""
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
         repo = git.Repo(self.workspace_root)
 
@@ -234,7 +245,8 @@ class BoughAnalyzer:
         return AnalysisResult(buildable_affected, changed_files)
 
     def get_affected_packages(
-        self, base_commit="HEAD^", selection="buildable"
+        self, base_commit: str = "HEAD^", selection: Selection = "buildable"
     ) -> set[str]:
+        """Return the affected packages."""
         packages, _ = self.find_affected(base_commit, selection)
         return packages

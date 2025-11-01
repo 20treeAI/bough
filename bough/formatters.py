@@ -1,3 +1,5 @@
+"""Formatter functions for use in various tools."""
+
 import json
 
 from bough.analyzer import BoughAnalyzer
@@ -6,6 +8,7 @@ from bough.analyzer import BoughAnalyzer
 def human_readable(
     analyzer: BoughAnalyzer, affected_packages: set[str], changed_files: set[str]
 ) -> str:
+    """Output the analysis results in a textual format suitable for CLI usage."""
     lines = []
 
     if affected_packages:
@@ -27,6 +30,7 @@ def human_readable(
 
 
 def github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
+    """Output the analysis results in a format suitable for use with GitHub actions."""
     matrix_items = []
 
     for package_name in sorted(affected_packages):
@@ -39,6 +43,7 @@ def github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
 
 
 def dependency_graph(analyzer: BoughAnalyzer) -> str:
+    """Output the dependency graph for the CLI."""
     lines = []
 
     buildable_packages = set()

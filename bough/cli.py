@@ -1,3 +1,5 @@
+"""CLI entry point for bough."""
+
 import argparse
 import logging
 import sys
@@ -7,7 +9,8 @@ import bough.formatters as fmt
 from bough.analyzer import BoughAnalyzer
 
 
-def main():
+def main() -> None:
+    """Parse the CLI options and invoke the analysis tool."""
     default_parser = argparse.ArgumentParser(add_help=False)
     default_parser.add_argument(
         "--config",

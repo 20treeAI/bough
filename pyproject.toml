@@ -38,11 +38,22 @@ exclude = ["tests/fixtures/sample-workspace/**/*.py"]
 [tool.ruff.lint]
 # select = ["ALL"]
 # select = ["F", "B", "ANN", "D", "E"]
-select = ["F", "B", "E", "I", "S", "UP", "SIM"]
-ignore = ["E501"]
+select = [
+  "B", "E", "F", # basic errors
+  "I", # style stuff
+  "S", # security
+  "UP", "SIM", # modern and simple python
+  "N", "ICN", "C4",  # naming stuff
+  "D", # docstrings
+  "ANN",
+]
+ignore = ["E501", # line length -- let format handle it
+  "D203", "D213", # incompatible with D212
+  "D107", "D104", # __init__ docstrings are :/
+]
 
 [tool.ruff.lint.per-file-ignores]
-"**/{tests}/*" = ["S101", "D"]
+"**/{tests}/*" = ["S101", "D", "ANN"]
 
 [tool.ty.src]
 include = ["bough", "tests"]
