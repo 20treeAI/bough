@@ -1,132 +1,10 @@
 import argparse
-import json
 import logging
 import sys
 from pathlib import Path
 
-from .analyzer import BoughAnalyzer
-
-
-def format_human_readable(
-    analyzer: BoughAnalyzer, affected_packages: set[str], changed_files: set[str]
-) -> str:
-    lines = []
-
-    if affected_packages:
-        lines.append("Packages to rebuild:")
-        for package_name in sorted(affected_packages):
-            package = analyzer.packages[package_name]
-            rel_path = package.directory.relative_to(analyzer.workspace_root)
-            lines.append(f"  {package_name} ({rel_path})")
-    else:
-        lines.append("No packages need rebuilding.")
-
-    if changed_files:
-        lines.append("")
-        lines.append("Changed files:")
-        for file_path in sorted(changed_files):
-            lines.append(f"  {file_path}")
-
-    return "\n".join(lines)
-
-
-def format_github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
-    matrix_items = []
-
-    for package_name in sorted(affected_packages):
-        package = analyzer.packages[package_name]
-        rel_path = str(package.directory.relative_to(analyzer.workspace_root))
-        matrix_items.append({"package": package_name, "directory": rel_path})
-
-    matrix = {"include": matrix_items}
-    return json.dumps(matrix, indent=2)
-
-
-def format_dependency_graph(analyzer: BoughAnalyzer) -> str:
-    lines = []
-
-    buildable_packages = set()
-    for package_name, package in analyzer.packages.items():
-        if analyzer._is_buildable_package(package):
-            buildable_packages.add(package_name)
-
-    buildable = []
-    libraries = []
-
-    for package_name in sorted(analyzer.packages.keys()):
-        package = analyzer.packages[package_name]
-        rel_path = package.directory.relative_to(analyzer.workspace_root)
-
-        package_info = {
-            "name": package_name,
-            "path": rel_path,
-            "dependencies": package.dependencies,
-            "dependents": analyzer.dependency_graph.get(package_name, set()),
-        }
-
-        if package_name in buildable_packages:
-            buildable.append(package_info)
-        else:
-            libraries.append(package_info)
-
-    if buildable:
-        lines.append("🚀 Buildable Packages:")
-        lines.append("=" * 50)
-        for pkg in buildable:
-            lines.append(f"📦 {pkg['name']} ({pkg['path']})")
-            if pkg["dependencies"]:
-                lines.append(
-                    f"   └─ depends on: {', '.join(sorted(pkg['dependencies']))}"
-                )
-            else:
-                lines.append("   └─ depends on: (none)")
-
-            # Warn if buildable packages have dependents (architectural issue)
-            if pkg["dependents"]:
-                lines.append(
-                    f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)"
-                )
-            lines.append("")
-
-    if libraries:
-        lines.append("📚 Library Packages:")
-        lines.append("=" * 50)
-        for pkg in libraries:
-            lines.append(f"📖 {pkg['name']} ({pkg['path']})")
-            if pkg["dependencies"]:
-                lines.append(
-                    f"   ├─ depends on: {', '.join(sorted(pkg['dependencies']))}"
-                )
-            else:
-                lines.append("   ├─ depends on: (none)")
-
-            if pkg["dependents"]:
-                lines.append(
-                    f"   └─ depended on by: {', '.join(sorted(pkg['dependents']))}"
-                )
-            else:
-                lines.append("   └─ depended on by: (none)")
-            lines.append("")
-
-    if not buildable and not libraries:
-        lines.append("No packages found in workspace.")
-
-    return "\n".join(lines)
-
-
-def get_changed_files(analyzer: BoughAnalyzer, base_commit: str) -> set[str]:
-    import git
-
-    repo = git.Repo(analyzer.workspace_root)
-
-    changed_files = set()
-    for item in repo.commit(base_commit).diff(repo.head.commit):
-        if item.a_path:
-            changed_files.add(item.a_path)
-        if item.b_path:
-            changed_files.add(item.b_path)
-
-    return changed_files
+from bough.analyzer import BoughAnalyzer
+import bough.formatters as fmt
 
 
 def main():
@@ -171,6 +49,12 @@ def main():
         default="text",
         help="Output format (default: text)",
     )
+    analyze_parser.add_argument(
+        "--selection",
+        choices=["buildable", "all"],
+        default="buildable",
+        help="Return only buildables or all packages (default: buildable)",
+    )
 
     args = parser.parse_args()
     if args.command is None:
@@ -188,23 +72,20 @@ def main():
         analyzer = BoughAnalyzer.from_workspace(args.workspace, config_path)
 
         if args.command == "graph":
-            output = format_dependency_graph(analyzer)
+            output = fmt.dependency_graph(analyzer)
             print(output)
             sys.exit(0)
         else:
-            affected_packages = analyzer.get_affected_packages(args.base)
+            packages, files = analyzer.find_affected(args.base, args.selection)
 
             if args.format == "github-matrix":
-                output = format_github_matrix(analyzer, affected_packages)
+                output = fmt.github_matrix(analyzer, packages)
                 print(output)
                 sys.exit(0)
             else:
-                changed_files = get_changed_files(analyzer, args.base)
-                output = format_human_readable(
-                    analyzer, affected_packages, changed_files
-                )
+                output = fmt.human_readable(analyzer, packages, files)
                 print(output)
-                sys.exit(0 if not affected_packages else 1)
+                sys.exit(0)
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
