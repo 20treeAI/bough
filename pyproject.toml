@@ -34,7 +34,7 @@ dev = [
 
 [tool.ruff]
 exclude = ["tests/fixtures/sample-workspace/**/*.py"]
-target-version = "py314"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
@@ -61,7 +61,7 @@ ignore = [
 "bough/cli.py" = ["T201"]
 
 [tool.ty.environment]
-python-version = "3.14"
+python-version = "3.12"
 
 [tool.ty.src]
 include = ["bough", "tests"]
