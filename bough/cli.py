@@ -198,8 +198,7 @@ def main():
             print(output)
             sys.exit(0)
         else:
-            buildables, packages, files = analyzer.get_affected_packages(args.base)
-            packages = buildables if args.selection == "buildable" else packages
+            packages, files = analyzer.find_affected(args.base, args.selection)
 
             if args.format == "github-matrix":
                 output = format_github_matrix(analyzer, packages)
@@ -210,7 +209,7 @@ def main():
                     analyzer, packages, files
                 )
                 print(output)
-                sys.exit(0 if not buildables else 1)
+                sys.exit(0)
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

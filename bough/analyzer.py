@@ -21,7 +21,6 @@ class Package:
     dependencies: Set[str]
 
 class AnalysisResult(NamedTuple):
-    buildables: Set[str]
     packages: Set[str]
     files: Set[str]
 
@@ -161,7 +160,7 @@ class BoughAnalyzer:
         package_rel_path = str(package.directory.relative_to(self.workspace_root))
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
-    def get_affected_packages(self, base_commit="HEAD^") -> AnalysisResult:
+    def find_affected(self, base_commit="HEAD^", selection="buildable") -> AnalysisResult:
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
         repo = git.Repo(self.workspace_root)
 
@@ -219,6 +218,9 @@ class BoughAnalyzer:
 
         logger.debug(f"All affected packages (including transitive): {all_affected}")
 
+        if selection != "buildable":
+            return all_affected, changed_files
+
         buildable_affected = set()
         for package_name in all_affected:
             package = self.packages[package_name]
@@ -229,4 +231,9 @@ class BoughAnalyzer:
                 logger.debug(f"Package {package_name} is not buildable (filtered out)")
 
         logger.debug(f"Final buildable affected packages: {buildable_affected}")
-        return (buildable_affected, all_affected, changed_files)
+        return (buildable_affected, changed_files)
+
+
+    def get_affected_packages(self, base_commit="HEAD^", selection="buildable") -> AnalysisResult:
+        packages, _ = self.find_affected(base_commit, selection)
+        return packages
