@@ -148,8 +148,8 @@ This tool is intentionally simple:
 
 ## Roadmap
 
-- [ ] provide an option that outputs all affected packages, not just buildable ones (useful for selectively running tests)
+- [x] provide an option that outputs all affected packages, not just buildable ones (useful for selectively running tests)
 - [ ] check in a sample configuration file and document the defaults better
 - [ ] improve or remove the github actions examples
-- [ ] setup a release workflow to pypi
+- [x] setup a release workflow to pypi
 - [ ] add a contributing guide
