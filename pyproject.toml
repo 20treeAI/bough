@@ -1,6 +1,6 @@
 [project]
 name = "bough"
-version = "0.1.0"
+version = "0.1.3"
 description = "bough is a tool to determine which uv workspace packages need rebuilding based on git changes"
 authors = [
   {name = "Andrew Nichols", email = "andrew.nichols@overstory.com"},
