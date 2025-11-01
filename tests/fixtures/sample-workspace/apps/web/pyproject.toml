@@ -1,7 +1,0 @@
-[project]
-name = "web"
-version = "0.1.0"
-description = "Web application"
-
-[tool.uv.sources]
-shared = { workspace = true }
