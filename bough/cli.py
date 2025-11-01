@@ -130,29 +130,32 @@ def get_changed_files(analyzer: BoughAnalyzer, base_commit: str) -> set[str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Determine which uv workspace packages need rebuilding based on git changes."
-    )
-    parser.add_argument(
+    default_parser = argparse.ArgumentParser(add_help=False)
+    default_parser.add_argument(
         "--config",
         type=Path,
         help="Path to .bough.yml config file (default: .bough.yml in workspace root)",
     )
-    parser.add_argument(
+    default_parser.add_argument(
         "--workspace",
         type=Path,
         default=Path.cwd(),
         help="Path to workspace root (default: current directory)",
     )
-    parser.add_argument(
+    default_parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
 
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    analyze_parser = subparsers.add_parser(
-        "analyze", help="Analyze git changes to determine affected packages"
+    parser = argparse.ArgumentParser(
+        description="Determine which uv workspace packages need rebuilding based on git changes.",
     )
+
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    analyze_parser = subparsers.add_parser(
+        "analyze", help="Analyze git changes to determine affected packages", parents=[default_parser]
+    )
+    graph_parser = subparsers.add_parser("graph", help="Display the dependency graph", parents=[default_parser])
+
     analyze_parser.add_argument(
         "--base",
         default="HEAD^",
@@ -165,17 +168,12 @@ def main():
         help="Output format (default: text)",
     )
 
-    _ = subparsers.add_parser("graph", help="Display the dependency graph")
-
     args = parser.parse_args()
+    if args.command is None:
+        args = parser.parse_args(["analyze"])
 
     log_level = logging.DEBUG if args.verbose else logging.WARNING
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
-
-    if args.command is None:
-        args.command = "analyze"
-        args.base = "HEAD^"
-        args.format = "text"
 
     if args.config:
         config_path = args.config

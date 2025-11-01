@@ -16,13 +16,13 @@ Analyze dependencies and git diffs to identify affected packages, then build onl
 bough
 
 # Custom base commit
-bough --base main
+bough --base main analyze
 
 # Display dependency graph
 bough graph
 
 # Output GitHub Actions matrix format
-bough analyze --format github-matrix
+bough --format github-matrix analyze
 ```
 
 ## Examples
