@@ -3,7 +3,6 @@
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-
 from bough.analyzer import BoughAnalyzer
 
 

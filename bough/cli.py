@@ -3,8 +3,8 @@ import logging
 import sys
 from pathlib import Path
 
-from bough.analyzer import BoughAnalyzer
 import bough.formatters as fmt
+from bough.analyzer import BoughAnalyzer
 
 
 def main():

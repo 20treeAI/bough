@@ -4,7 +4,7 @@ import logging
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Set, NamedTuple, Optional
+from typing import Dict, NamedTuple, Optional, Set
 
 import git
 from packaging.requirements import Requirement

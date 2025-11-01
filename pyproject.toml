@@ -35,6 +35,15 @@ dev = [
 [tool.ruff]
 exclude = ["tests/fixtures/sample-workspace/**/*.py"]
 
+[tool.ruff.lint]
+# select = ["ALL"]
+# select = ["F", "B", "ANN", "D", "E"]
+select = ["F", "B", "E", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests}/*" = ["S101", "D"]
+
 [tool.ty.src]
 include = ["bough", "tests"]
 exclude = ["tests/fixtures/sample-workspace/**/*.py"]
