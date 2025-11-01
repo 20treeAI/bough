@@ -1,7 +1,7 @@
 all: setup test lint
 
 setup:
-  uv sync --locked --dev
+  uv sync --frozen --dev
   tests/scripts/setup-sample.sh
 
 test file='':
