@@ -1,6 +1,6 @@
 # Bough
 
-[`bough`](https://en.wiktionary.org/wiki/bough) is a tool to determine which uv workspace packages need rebuilding based on git changes.
+[`bough`](https://en.wiktionary.org/wiki/bough) is a tool to determine which uv workspace packages need building or testing based on git changes.
 
 ## Problem
 
@@ -148,8 +148,9 @@ This tool is intentionally simple:
 
 ## Roadmap
 
+- [x] setup a release workflow to pypi
 - [x] provide an option that outputs all affected packages, not just buildable ones (useful for selectively running tests)
+- [x] handle working tree changes
 - [ ] check in a sample configuration file and document the defaults better
 - [ ] improve or remove the github actions examples
-- [x] setup a release workflow to pypi
 - [ ] add a contributing guide
