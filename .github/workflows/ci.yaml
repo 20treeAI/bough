@@ -15,11 +15,16 @@ jobs:
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e #v6.8.0
       - name: setup repo
         run: just setup
+      - name: run linting
+        run: just lint
       - name: run tests with test info
         run: just coverage xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 #v5.5.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: run linting
-        run: just lint
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f #v1.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
