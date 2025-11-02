@@ -46,14 +46,14 @@ select = [
   "D", # docstrings
   "ANN", # type annotations
   "T", "G", # printing
-  "PERF",
+  "PERF", 
+  # "PLR", "C",
 ]
 ignore = [
   "COM812", "E501", # let format handle these
   "D203", "D213", # incompatible with D212
   "D107", "D104", # __init__ docstrings are :/
   "G004", # f-string logs are nice?
-  "C", "PLR", # complexity stuff TODO: enable
 ]
 
 [tool.ruff.lint.per-file-ignores]

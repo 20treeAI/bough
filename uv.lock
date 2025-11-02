@@ -12,7 +12,7 @@ wheels = [
 
 [[package]]
 name = "bough"
-version = "0.2.2.dev1+g7e6f80d85.d20251101"
+version = "0.2.2.dev5+g95b3f39a1.d20251102"
 source = { editable = "." }
 dependencies = [
     { name = "gitpython" },

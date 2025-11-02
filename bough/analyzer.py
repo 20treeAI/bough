@@ -169,7 +169,6 @@ class BoughAnalyzer:
         package_rel_path = str(package.directory.relative_to(self.workspace_root))
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
-
     def _find_direct_packages(
         self,
         changed_files: set[str],
@@ -217,7 +216,6 @@ class BoughAnalyzer:
 
         logger.debug(f"All affected packages (including transitive): {all_affected}")
         return all_affected
-
 
     def find_affected(
         self,
