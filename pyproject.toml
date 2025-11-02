@@ -46,8 +46,7 @@ select = [
   "D", # docstrings
   "ANN", # type annotations
   "T", "G", # printing
-  "PERF", 
-  # "PLR", "C",
+  "PERF", "PLR", "C", # complexity
 ]
 ignore = [
   "COM812", "E501", # let format handle these

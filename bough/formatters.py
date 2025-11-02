@@ -53,6 +53,34 @@ def github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
     return json.dumps(matrix, indent=2)
 
 
+def _render_graph(packages: list[dict], title: str, warning: bool = False) -> list[str]:
+    lines = [title]
+    lines.append("=" * 50)
+    for pkg in packages:
+        lines.append(f"📦 {pkg['name']} ({pkg['path']})")
+        if pkg["dependencies"]:
+            lines.append(
+                f"   └─ depends on: {', '.join(sorted(pkg['dependencies']))}",
+            )
+        else:
+            lines.append("   └─ depends on: (none)")
+
+        if pkg["dependents"]:
+            if warning:
+                lines.append(
+                    f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)",
+                )
+            else:
+                lines.append(
+                    f"   └─ depended on by: {', '.join(sorted(pkg['dependents']))}",
+                )
+
+        else:
+            lines.append("   └─ depended on by: (none)")
+        lines.append("")
+    return lines
+
+
 def dependency_graph(analyzer: BoughAnalyzer) -> str:
     """Output the dependency graph for the CLI."""
     lines = []
@@ -82,43 +110,10 @@ def dependency_graph(analyzer: BoughAnalyzer) -> str:
             libraries.append(package_info)
 
     if buildable:
-        lines.append("🚀 Buildable Packages:")
-        lines.append("=" * 50)
-        for pkg in buildable:
-            lines.append(f"📦 {pkg['name']} ({pkg['path']})")
-            if pkg["dependencies"]:
-                lines.append(
-                    f"   └─ depends on: {', '.join(sorted(pkg['dependencies']))}",
-                )
-            else:
-                lines.append("   └─ depends on: (none)")
-
-            # Warn if buildable packages have dependents (architectural issue)
-            if pkg["dependents"]:
-                lines.append(
-                    f"   ⚠️  WARNING: depended on by {', '.join(sorted(pkg['dependents']))} (buildables shouldn't have dependents)",
-                )
-            lines.append("")
+        lines.extend(_render_graph(buildable, "🚀 Buildable Packages:", warning=True))
 
     if libraries:
-        lines.append("📚 Library Packages:")
-        lines.append("=" * 50)
-        for pkg in libraries:
-            lines.append(f"📖 {pkg['name']} ({pkg['path']})")
-            if pkg["dependencies"]:
-                lines.append(
-                    f"   ├─ depends on: {', '.join(sorted(pkg['dependencies']))}",
-                )
-            else:
-                lines.append("   ├─ depends on: (none)")
-
-            if pkg["dependents"]:
-                lines.append(
-                    f"   └─ depended on by: {', '.join(sorted(pkg['dependents']))}",
-                )
-            else:
-                lines.append("   └─ depended on by: (none)")
-            lines.append("")
+        lines.extend(_render_graph(buildable, "📚 Library Packages:"))
 
     if not buildable and not libraries:
         lines.append("No packages found in workspace.")
