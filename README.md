@@ -151,6 +151,6 @@ This tool is intentionally simple:
 - [x] setup a release workflow to pypi
 - [x] provide an option that outputs all affected packages, not just buildable ones (useful for selectively running tests)
 - [x] handle working tree changes
+- [x] add a contributing guide
 - [ ] check in a sample configuration file and document the defaults better
 - [ ] improve or remove the github actions examples
-- [ ] add a contributing guide
