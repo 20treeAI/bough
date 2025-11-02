@@ -12,3 +12,4 @@ tests/fixtures/sample-workspace
 .coverage
 coverage.xml
 htmlcov
+junit.xml
