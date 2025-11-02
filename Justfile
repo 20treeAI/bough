@@ -9,11 +9,10 @@ setup:
 test file='':
   uv run pytest -x --pdb --pdbcls=IPython.terminal.debugger:TerminalPdb {{file}}
 
-# Compute test coverage information
-coverage:
+# Compute test coverage information (formats: report, html, xml)
+coverage format='report':
   uv run coverage run --branch -m pytest
-  uv run coverage html --omit=tests/**/*.py
-  uv run coverage report --omit=tests/**/*.py
+  uv run coverage {{format}} --omit=tests/**/*.py
 
 # Run linters and formatters
 lint:
