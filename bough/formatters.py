@@ -30,6 +30,16 @@ def human_readable(
     return "\n".join(lines)
 
 
+def quiet(
+    analyzer: BoughAnalyzer,
+    affected_packages: set[str],
+) -> str:
+    """Output each package directory root on a separate line, suitable for useage in scripting."""
+    return "\n".join(
+        str(analyzer.packages[package].directory) for package in affected_packages
+    )
+
+
 def github_matrix(analyzer: BoughAnalyzer, affected_packages: set[str]) -> str:
     """Output the analysis results in a format suitable for use with GitHub actions."""
     matrix_items = []
