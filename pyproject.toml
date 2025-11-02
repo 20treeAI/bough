@@ -25,6 +25,7 @@ source = "vcs"
 
 [dependency-groups]
 dev = [
+    "coverage>=7.11.0",
     "ipdb>=0.13.13",
     "pytest>=8.4.1",
     "ruff>=0.12.11",

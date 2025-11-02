@@ -147,21 +147,6 @@ class BoughAnalyzer:
                     self.dependency_graph[dependency].add(package_name)
                     logger.debug(f"Added edge: {dependency} <- {package_name}")
 
-    def _calculate_transitive_effects(self, directly_affected: set[str]) -> set[str]:
-        """Calculate all packages affected by changes, including transitive dependencies."""
-        all_affected = set(directly_affected)
-        queue = list(directly_affected)
-
-        while queue:
-            pkg = queue.pop(0)
-            dependents = self.dependency_graph.get(pkg, set())
-            for dependent in dependents:
-                if dependent not in all_affected:
-                    all_affected.add(dependent)
-                    queue.append(dependent)
-
-        return all_affected
-
     def _matches_patterns(self, path: str, patterns: list[str]) -> bool:
         return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
