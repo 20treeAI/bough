@@ -55,8 +55,12 @@ def mock_git_changes(changed_files: list[str]):
     """Create a mock git repo that reports the given files as changed."""
     mock_repo = Mock()
     mock_commit = Mock()
+    mock_index = Mock()
+
     mock_repo.commit.return_value = mock_commit
     mock_repo.head.commit = mock_commit
+    mock_repo.index = mock_index
+    mock_repo.untracked_files = []
 
     # Create mock diff items
     mock_diff_items = []
@@ -67,6 +71,7 @@ def mock_git_changes(changed_files: list[str]):
         mock_diff_items.append(mock_item)
 
     mock_commit.diff.return_value = mock_diff_items
+    mock_index.diff.return_value = []
     return mock_repo
 
 

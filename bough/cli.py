@@ -53,7 +53,7 @@ def main() -> None:
     )
     analyze_parser.add_argument(
         "--format",
-        choices=["text", "github-matrix"],
+        choices=["text", "github-matrix", "quiet"],
         default="text",
         help="Output format (default: text)",
     )
@@ -85,12 +85,13 @@ def main() -> None:
 
             if args.format == "github-matrix":
                 output = fmt.github_matrix(analyzer, packages)
-                print(output)
-                sys.exit(0)
+            elif args.format == "quiet":
+                output = fmt.quiet(analyzer, packages)
             else:
                 output = fmt.human_readable(analyzer, packages, files)
-                print(output)
-                sys.exit(0)
+
+            print(output)
+            sys.exit(0)
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
