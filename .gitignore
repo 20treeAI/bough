@@ -4,6 +4,7 @@
 *.swp
 __pycache__
 .pyc
+.hypothesis
 
 # sample repo
 tests/fixtures/sample-workspace

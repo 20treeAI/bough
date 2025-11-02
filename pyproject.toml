@@ -25,6 +25,7 @@ source = "vcs"
 
 [dependency-groups]
 dev = [
+    "hypothesis>=6.143.1",
     "ipdb>=0.13.13",
     "pytest>=8.4.1",
     "pytest-cov>=7.0.0",

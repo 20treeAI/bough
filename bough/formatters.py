@@ -113,7 +113,7 @@ def dependency_graph(analyzer: BoughAnalyzer) -> str:
         lines.extend(_render_graph(buildable, "🚀 Buildable Packages:", warning=True))
 
     if libraries:
-        lines.extend(_render_graph(buildable, "📚 Library Packages:"))
+        lines.extend(_render_graph(libraries, "📚 Library Packages:"))
 
     if not buildable and not libraries:
         lines.append("No packages found in workspace.")
