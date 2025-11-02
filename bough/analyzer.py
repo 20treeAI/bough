@@ -169,19 +169,11 @@ class BoughAnalyzer:
         package_rel_path = str(package.directory.relative_to(self.workspace_root))
         return self._matches_patterns(package_rel_path, self.config.buildable)
 
-    def find_affected(
+
+    def _find_direct_packages(
         self,
-        base_commit: str = "HEAD^",
-        selection: Selection = "buildable",
-    ) -> AnalysisResult:
-        """Return the affected packages and files."""
-        logger.debug(f"Analyzing changes from {base_commit} to HEAD")
-
-        changed_files = find_changed_files(self.workspace_root, base_commit)
-        logger.debug(
-            f"Found {len(changed_files)} changed files: {sorted(changed_files)}",
-        )
-
+        changed_files: set[str],
+    ) -> set[str]:
         directly_affected = set()
         for file_path in changed_files:
             file_path_obj = Path(file_path)
@@ -202,14 +194,14 @@ class BoughAnalyzer:
                 except ValueError:
                     continue
 
-            # Root file affects all packages
             if not package_found:
                 logger.debug(f"Root file {file_path} affects all packages")
                 directly_affected.update(self.packages.keys())
 
         logger.debug(f"Directly affected packages: {directly_affected}")
+        return directly_affected
 
-        # Calculate transitive dependencies
+    def _find_transitive_packages(self, directly_affected: set[str]) -> set[str]:
         logger.debug("Calculating transitive dependencies")
         all_affected = set(directly_affected)
         queue = list(directly_affected)
@@ -224,9 +216,22 @@ class BoughAnalyzer:
                     queue.append(dependent)
 
         logger.debug(f"All affected packages (including transitive): {all_affected}")
+        return all_affected
+
+
+    def find_affected(
+        self,
+        base_commit: str = "HEAD^",
+        selection: Selection = "buildable",
+    ) -> AnalysisResult:
+        """Return the affected packages and files."""
+        logger.debug(f"Analyzing changes from {base_commit} to HEAD")
+
+        files = find_changed_files(self.workspace_root, base_commit)
+        all_affected = self._find_transitive_packages(self._find_direct_packages(files))
 
         if selection != "buildable":
-            return AnalysisResult(all_affected, changed_files)
+            return AnalysisResult(all_affected, files)
 
         buildable_affected = set()
         for package_name in all_affected:
@@ -238,13 +243,4 @@ class BoughAnalyzer:
                 logger.debug(f"Package {package_name} is not buildable (filtered out)")
 
         logger.debug(f"Final buildable affected packages: {buildable_affected}")
-        return AnalysisResult(buildable_affected, changed_files)
-
-    def get_affected_packages(
-        self,
-        base_commit: str = "HEAD^",
-        selection: Selection = "buildable",
-    ) -> set[str]:
-        """Return the affected packages."""
-        packages, _ = self.find_affected(base_commit, selection)
-        return packages
+        return AnalysisResult(buildable_affected, files)
