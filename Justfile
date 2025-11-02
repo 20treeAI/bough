@@ -1,4 +1,4 @@
-_all: setup test lint
+_all: setup lint coverage
 
 # Setup the python environment
 setup:
@@ -8,7 +8,11 @@ setup:
 # Run tests
 test file='':
   uv run pytest -x --pdb --pdbcls=IPython.terminal.debugger:TerminalPdb {{file}}
-  uv run tests/scripts/smoke.sh > /dev/null
+
+# Compute test coverage information (formats: report, html, xml)
+coverage format='report':
+  uv run coverage run --branch -m pytest
+  uv run coverage {{format}} --omit=tests/**/*.py
 
 # Run linters and formatters
 lint:

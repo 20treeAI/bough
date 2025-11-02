@@ -1,8 +1,11 @@
 """Handles git-based utility functions."""
 
+from logging import getLogger
 from pathlib import Path
 
 import git
+
+logger = getLogger(__name__)
 
 
 def find_changed_files(root: Path, base_commit: str) -> set[str]:
@@ -25,4 +28,7 @@ def find_changed_files(root: Path, base_commit: str) -> set[str]:
     for item in repo.index.diff("HEAD"):
         files.add(item.a_path)
 
+    logger.debug(
+        f"Found {len(files)} changed files: {sorted(files)}",
+    )
     return files

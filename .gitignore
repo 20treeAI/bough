@@ -1,6 +1,14 @@
+# dev artifacts
 .aider*
 !.aider.conf.yml
 *.swp
 __pycache__
 .pyc
-tests/fixtures/sample-workspace/README.md
+
+# sample repo
+tests/fixtures/sample-workspace
+
+# coverage artifacts
+.coverage
+coverage.xml
+htmlcov

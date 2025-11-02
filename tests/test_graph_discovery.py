@@ -83,6 +83,6 @@ def test_git_change_detection(
     analyzer = BoughAnalyzer.from_workspace(git_workspace, empty_config)
 
     # This should detect what changed and find affected packages
-    affected = analyzer.get_affected_packages()
+    affected, _ = analyzer.find_affected()
 
     assert affected == expected_affected, reason

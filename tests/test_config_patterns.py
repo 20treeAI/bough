@@ -36,7 +36,7 @@ ignore:
     repo.git.add(".")
     repo.index.commit("Update root config")
 
-    affected = analyzer.get_affected_packages()
+    affected, _ = analyzer.find_affected()
 
     # Should only return packages under packages/*, not apps/*
     expected = {"auth", "database", "shared"}  # packages/* only
@@ -72,7 +72,7 @@ ignore:
     repo.git.add(".")
     repo.index.commit("Update root config")
 
-    affected = analyzer.get_affected_packages()
+    affected, _ = analyzer.find_affected()
 
     # Should include apps/* and packages/shared
     expected = {"api", "web", "shared"}
@@ -108,7 +108,7 @@ ignore:
     repo.git.add(".")
     repo.index.commit("Add changelog")
 
-    affected = analyzer.get_affected_packages()
+    affected, _ = analyzer.find_affected()
 
     # Should be empty since .txt files are ignored
     assert affected == set()
@@ -144,7 +144,7 @@ ignore:
     repo.git.add(".")
     repo.index.commit("Add docs")
 
-    affected = analyzer.get_affected_packages()
+    affected, _ = analyzer.find_affected()
 
     # Should be empty since docs/** is ignored
     assert affected == set()
