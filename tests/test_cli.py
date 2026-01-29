@@ -12,6 +12,13 @@ def test_smoke_cli_graph():
 
 
 def test_smoke_cli_analyze():
-    sys.argv = ["bough", "analyze", "--workspace", "tests/fixtures/sample-workspace"]
+    sys.argv = [
+        "bough",
+        "analyze",
+        "--workspace",
+        "tests/fixtures/sample-workspace",
+        "--repo",
+        "tests/fixtures/sample-workspace",
+    ]
     with pytest.raises(SystemExit, match="0"):
         cli.main()

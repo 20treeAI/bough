@@ -23,6 +23,7 @@ def create_workspace_structure(base_path: Path, structure: dict):
         "project": {"name": "test-workspace", "version": "0.1.0"},
     }
 
+    base_path.mkdir(parents=True, exist_ok=True)
     with open(base_path / "pyproject.toml", "wb") as f:
         tomli_w.dump(root_config, f)
 
@@ -105,7 +106,7 @@ ignore:
 """)
 
     # Test the public interface
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     # Core change should transitively affect all buildable packages
@@ -133,7 +134,7 @@ ignore:
   - "*.md"
 """)
 
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     # Base change should affect top through both left and right paths
@@ -171,14 +172,14 @@ ignore:
 
     # Test 1: Change in models affects all apps
     mock_repo_class.return_value = mock_git_changes(["data/models/user.py"])
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     assert affected == {"rest-api", "graphql-api", "worker"}
 
     # Test 2: Change in middleware only affects APIs that use it
     mock_repo_class.return_value = mock_git_changes(["api/middleware/auth.py"])
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     assert affected == {"rest-api", "graphql-api"}
@@ -230,7 +231,7 @@ ignore:
 
     # Test 1: Change in proto affects everything
     mock_repo_class.return_value = mock_git_changes(["shared/proto/user.proto"])
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     expected = {
@@ -245,7 +246,7 @@ ignore:
 
     # Test 2: Change in events only affects services that use events
     mock_repo_class.return_value = mock_git_changes(["shared/events/order_created.py"])
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     expected = {"user-service", "order-service", "notification-service"}
@@ -276,7 +277,7 @@ ignore:
     mock_repo_class.return_value = mock_git_changes(
         ["tools/standalone-b/standalone_b.py"],
     )
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     assert affected == {"standalone-b"}
@@ -285,7 +286,7 @@ ignore:
     mock_repo_class.return_value = mock_git_changes(
         ["tools/standalone-a/standalone_a.py"],
     )
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     assert affected == {"standalone-a", "main"}
@@ -313,7 +314,7 @@ ignore:
 
     # Root pyproject.toml change should affect all buildable packages
     mock_repo_class.return_value = mock_git_changes(["pyproject.toml"])
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     assert affected == {"web", "api"}  # Only buildable packages
@@ -343,7 +344,7 @@ ignore:
     mock_repo_class.return_value = mock_git_changes(
         ["README.md", "docs/api.md", "CHANGELOG.txt"],
     )
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     assert affected == set()
@@ -376,8 +377,35 @@ ignore:
 
     # Change common library to affect everything
     mock_repo_class.return_value = mock_git_changes(["libs/common/common.py"])
-    analyzer = BoughAnalyzer.from_workspace(tmp_path, config_path)
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path, config_path)
     affected, _ = analyzer.find_affected()
 
     # Should only include packages matching buildable patterns
     assert affected == {"user-service", "api-gateway", "web"}
+
+
+@patch("git.Repo")
+def test_divergent_git_vs_workspace_roots(mock_repo_class, tmp_path):
+    """Test that root file changes affect all buildable packages."""
+    structure = {
+        "libs/utils": {"dependencies": []},
+        "apps/web": {"dependencies": ["utils"]},
+        "apps/api": {"dependencies": ["utils"]},
+        "tools/cli": {"dependencies": []},
+    }
+
+    create_workspace_structure(tmp_path / "src", structure)
+
+    config_path = tmp_path / ".bough.yml"
+    config_path.write_text("""
+buildable:
+  - "apps/*"
+ignore:
+  - "*.md"
+""")
+
+    mock_repo_class.return_value = mock_git_changes(["src/apps/web/foo"])
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path / "src", config_path)
+    affected, _ = analyzer.find_affected()
+
+    assert affected == {"web"}

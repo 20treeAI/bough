@@ -1,25 +1,26 @@
-from hypothesis import given, strategies as st
-from unittest.mock import Mock
-from pathlib import Path
 import json
+from pathlib import Path
+from unittest.mock import Mock
+
+from hypothesis import given
+from hypothesis import strategies as st
+
 import bough.formatters as sut
 
 package_name = st.text(
-    min_size=1, 
-    max_size=20,
-    alphabet=st.characters(blacklist_characters='\n\r')
+    min_size=1, max_size=20, alphabet=st.characters(blacklist_characters="\n\r")
 )
 
 packages = st.sets(package_name, min_size=1)
 files = st.sets(package_name, min_size=1)
+
 
 @given(packages)
 def test_github_matrix_always_valid_json(package_names):
     """GitHub matrix output must always be valid JSON."""
     analyzer = Mock()
     analyzer.packages = {
-        name: Mock(directory=Path(f"/root/{name}"))
-        for name in package_names
+        name: Mock(directory=Path(f"/root/{name}")) for name in package_names
     }
     analyzer.workspace_root = Path("/root")
 
@@ -35,8 +36,7 @@ def test_quiet_output_has_correct_line_count(package_names):
     """Quiet mode outputs exactly one line per package."""
     analyzer = Mock()
     analyzer.packages = {
-        name: Mock(directory=Path(f"/root/{name}"))
-        for name in package_names
+        name: Mock(directory=Path(f"/root/{name}")) for name in package_names
     }
 
     result = sut.quiet(analyzer, package_names)
@@ -49,8 +49,7 @@ def test_human_readable_contains_all_packages(packages, files):
     """All package names must appear in human readable output."""
     analyzer = Mock()
     analyzer.packages = {
-        name: Mock(directory=Path(f"/root/{name}"))
-        for name in packages
+        name: Mock(directory=Path(f"/root/{name}")) for name in packages
     }
     analyzer.workspace_root = Path("/root")
 
@@ -58,7 +57,6 @@ def test_human_readable_contains_all_packages(packages, files):
 
     for pkg in packages:
         assert pkg in result
-
 
 
 @st.composite
@@ -72,13 +70,12 @@ def package_graph(draw):
     for name in names:
         deps = draw(st.sets(st.sampled_from(names), max_size=3)) - {name}
         is_buildable = draw(st.booleans())
-        packages.append({
-            "name": name,
-            "dependencies": deps,
-            "is_buildable": is_buildable
-        })
+        packages.append(
+            {"name": name, "dependencies": deps, "is_buildable": is_buildable}
+        )
 
     return packages
+
 
 @given(package_graph())
 def test_dependency_graph_contains_all_packages(packages):
@@ -86,8 +83,7 @@ def test_dependency_graph_contains_all_packages(packages):
     analyzer = Mock()
     analyzer.packages = {
         pkg["name"]: Mock(
-            directory=Path(f"/root/{pkg['name']}"),
-            dependencies=pkg["dependencies"]
+            directory=Path(f"/root/{pkg['name']}"), dependencies=pkg["dependencies"]
         )
         for pkg in packages
     }
