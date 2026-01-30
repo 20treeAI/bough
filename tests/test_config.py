@@ -75,7 +75,9 @@ ignore:
   - "docs/**"
 """)
 
-    analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path)
+    analyzer = BoughAnalyzer.from_workspace(
+        sample_workspace, sample_workspace, config_path
+    )
 
     # Should have loaded config from .bough.yml in the workspace
     assert analyzer.config is not None
@@ -94,7 +96,9 @@ ignore:
   - "*.tmp"
 """)
 
-    analyzer = BoughAnalyzer.from_workspace(sample_workspace, config_path=custom_config)
+    analyzer = BoughAnalyzer.from_workspace(
+        sample_workspace, sample_workspace, config_path=custom_config
+    )
 
     assert analyzer.config.buildable == ["services/*"]
     assert analyzer.config.ignore == ["*.log", "*.tmp"]

@@ -1,7 +1,9 @@
 import tempfile
 from pathlib import Path
+
 import git
 import pytest
+
 import bough.git as sut
 
 

@@ -39,10 +39,12 @@ class BoughAnalyzer:
 
     def __init__(
         self,
+        repo_root: Path,
         workspace_root: Path,
         config: "BoughConfig",
         packages: dict[str, Package] | None = None,
     ) -> None:
+        self.repo_root = repo_root
         self.workspace_root = workspace_root
         logger.debug(f"Initializing analyzer for workspace: {workspace_root}")
         self.config = config
@@ -54,10 +56,12 @@ class BoughAnalyzer:
         logger.debug(f"Discovered {len(self.packages)} packages")
 
     @classmethod
-    def from_workspace(cls, workspace_root: Path, config_path: Path) -> "BoughAnalyzer":
+    def from_workspace(
+        cls, repo_root: Path, workspace_root: Path, config_path: Path
+    ) -> "BoughAnalyzer":
         """Create analyzer by discovering packages from workspace."""
         config = load_config(config_path)
-        return cls(workspace_root, config)
+        return cls(repo_root, workspace_root, config)
 
     def _discover_packages(self) -> None:
         root_pyproject = self.workspace_root / "pyproject.toml"
@@ -159,8 +163,9 @@ class BoughAnalyzer:
         changed_files: set[str],
     ) -> set[str]:
         directly_affected = set()
+        strip_prefix = self.workspace_root.relative_to(self.repo_root)
         for file_path in changed_files:
-            file_path_obj = Path(file_path)
+            file_path_obj = Path(file_path).relative_to(strip_prefix)
 
             if self._matches_patterns(file_path, self.config.ignore):
                 logger.debug(f"Ignoring file {file_path} (matches ignore patterns)")
@@ -210,7 +215,7 @@ class BoughAnalyzer:
         """Return the affected packages and files."""
         logger.debug(f"Analyzing changes from {base_commit} to HEAD")
 
-        files = find_changed_files(self.workspace_root, base_commit)
+        files = find_changed_files(self.repo_root, base_commit)
         all_affected = self._find_transitive_packages(self._find_direct_packages(files))
 
         if selection != "buildable":

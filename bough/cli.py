@@ -24,6 +24,12 @@ def main() -> None:
         help="Path to workspace root (default: current directory)",
     )
     default_parser.add_argument(
+        "--repo",
+        type=Path,
+        default=Path.cwd(),
+        help="Path to git repository root (default: current directory)",
+    )
+    default_parser.add_argument(
         "--verbose",
         "-v",
         action="store_true",
@@ -74,7 +80,7 @@ def main() -> None:
     config_path = args.config or args.workspace / ".bough.yaml"
 
     try:
-        analyzer = BoughAnalyzer.from_workspace(args.workspace, config_path)
+        analyzer = BoughAnalyzer.from_workspace(args.repo, args.workspace, config_path)
 
         if args.command == "graph":
             output = fmt.dependency_graph(analyzer)
