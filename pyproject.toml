@@ -31,7 +31,7 @@ dev = [
     "pytest-cov>=7.0.0",
     "ruff>=0.12.11",
     "tomli-w>=1.0.0",
-    "ty>=0.0.1a25",
+    "ty>=0.0.15",
 ]
 
 [tool.ruff]
