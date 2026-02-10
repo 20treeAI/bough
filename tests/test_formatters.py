@@ -77,7 +77,7 @@ def package_graph(draw):
     return packages
 
 
-@given(package_graph())
+@given(package_graph())  # ty: ignore[missing-argument]
 def test_dependency_graph_contains_all_packages(packages):
     """All package names must appear in dependency graph output."""
     analyzer = Mock()

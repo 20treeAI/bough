@@ -1,10 +1,9 @@
 """Test complex repository scenarios using real workspaces and mocked git."""
 
-import pytest
-
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import pytest
 import tomli_w
 
 from bough.analyzer import BoughAnalyzer
