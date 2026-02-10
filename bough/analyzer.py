@@ -165,7 +165,12 @@ class BoughAnalyzer:
         directly_affected = set()
         strip_prefix = self.workspace_root.relative_to(self.repo_root)
         for file_path in changed_files:
-            file_path_obj = Path(file_path).relative_to(strip_prefix)
+            try:
+                file_path_obj = Path(file_path).relative_to(strip_prefix)
+            except ValueError as e:
+                if "is not in the subpath" in str(e):
+                    logger.debug("Ignoring file {file_path} outside of workspace")
+                    continue
 
             if self._matches_patterns(file_path, self.config.ignore):
                 logger.debug(f"Ignoring file {file_path} (matches ignore patterns)")
