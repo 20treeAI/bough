@@ -3,6 +3,7 @@
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import pytest
 import tomli_w
 
 from bough.analyzer import BoughAnalyzer
@@ -409,3 +410,29 @@ ignore:
     affected, _ = analyzer.find_affected()
 
     assert affected == {"web"}
+
+
+@pytest.mark.parametrize(
+    "changed_file",
+    ["frontend/foo", "Dockerfile", ".github/workflows/ci.yaml"],
+)
+@patch("git.Repo")
+def test_changed_files_outside_workspace(mock_repo_class, tmp_path, changed_file):
+    """Test that files outside the workspace do not trigger any builds."""
+    structure = {
+        "tools/cli": {"dependencies": []},
+    }
+
+    create_workspace_structure(tmp_path / "backend", structure)
+
+    config_path = tmp_path / ".bough.yml"
+    config_path.write_text("""
+buildable:
+  - "tools/*"
+""")
+
+    mock_repo_class.return_value = mock_git_changes([changed_file])
+    analyzer = BoughAnalyzer.from_workspace(tmp_path, tmp_path / "backend", config_path)
+    affected, _ = analyzer.find_affected()
+
+    assert affected == set()
