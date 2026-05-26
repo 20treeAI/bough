@@ -2,13 +2,11 @@
 name = "bough"
 dynamic = ["version"]
 description = "bough is a tool to determine which uv workspace packages need rebuilding based on git changes"
-authors = [
-  {name = "Andrew Nichols", email = "andrew.nichols@overstory.com"},
-]
+authors = [{ name = "Andrew Nichols", email = "andrew.nichols@overstory.com" }]
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["pyyaml>=6.0", "packaging>=21.0", "gitpython>=3.1.0"]
+dependencies = ["pyyaml>=6.0", "packaging>=21.0", "gitpython>=3.1.49"]
 
 [project.scripts]
 bough = "bough.cli:main"
@@ -25,13 +23,13 @@ source = "vcs"
 
 [dependency-groups]
 dev = [
-    "hypothesis>=6.143.1",
-    "ipdb>=0.13.13",
-    "pytest>=8.4.1",
-    "pytest-cov>=7.0.0",
-    "ruff>=0.12.11",
-    "tomli-w>=1.0.0",
-    "ty>=0.0.15",
+  "hypothesis>=6.143.1",
+  "ipdb>=0.13.13",
+  "pytest>=8.4.1",
+  "pytest-cov>=7.0.0",
+  "ruff>=0.12.11",
+  "tomli-w>=1.0.0",
+  "ty>=0.0.15",
 ]
 
 [tool.ruff]
@@ -40,21 +38,35 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = [
-  "B", "E", "F", "RUF", # basic errors
-  "I", "COM", "PLC", # style stuff
-  "S", # security
-  "UP", "SIM", # modern and simple python
-  "N", "ICN", "C4",  # naming stuff
-  "D", # docstrings
-  "ANN", # type annotations
-  "T", "G", # printing
-  "PERF", "PLR", "C", # complexity
+  "B",
+  "E",
+  "F",
+  "RUF",  # basic errors
+  "I",
+  "COM",
+  "PLC",  # style stuff
+  "S",    # security
+  "UP",
+  "SIM",  # modern and simple python
+  "N",
+  "ICN",
+  "C4",   # naming stuff
+  "D",    # docstrings
+  "ANN",  # type annotations
+  "T",
+  "G",    # printing
+  "PERF",
+  "PLR",
+  "C",    # complexity
 ]
 ignore = [
-  "COM812", "E501", # let format handle these
-  "D203", "D213", # incompatible with D212
-  "D107", "D104", # __init__ docstrings are :/
-  "G004", # f-string logs are nice?
+  "COM812",
+  "E501",   # let format handle these
+  "D203",
+  "D213",   # incompatible with D212
+  "D107",
+  "D104",   # __init__ docstrings are :/
+  "G004",   # f-string logs are nice?
 ]
 
 [tool.ruff.lint.per-file-ignores]
