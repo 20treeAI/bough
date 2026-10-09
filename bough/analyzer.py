@@ -66,6 +66,8 @@ class BoughAnalyzer:
     def _discover_packages(self) -> None:
         root_pyproject = self.workspace_root / "pyproject.toml"
         logger.debug(f"Reading workspace config from {root_pyproject}")
+        if ".." in str(root_pyproject):
+            raise Exception("Invalid file path")
         with open(root_pyproject, "rb") as f:
             root_config = tomllib.load(f)
 
